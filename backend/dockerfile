@@ -1,4 +1,4 @@
-# Build da aplicação
+# Etapa - 1 Build da aplicação
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
@@ -22,8 +22,9 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build /app .
 
-# Configura porta do render
+# Configura porta para Fly.io
 ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
 
+# Inicia a aplicação
 ENTRYPOINT ["dotnet", "LevelByte.API.dll"]
