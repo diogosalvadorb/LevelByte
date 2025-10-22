@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+
 builder.Services.AddDbContext<LevelByteDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Neon")));
 
@@ -14,22 +16,26 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IArticleRepository, ArticleRepository>();
 builder.Services.AddMediatR(typeof(CreateArticleCommand));
 
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+builder.Services.AddCors(options =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    options.AddPolicy("AllowFront", policy =>
+        policy.WithOrigins("https://meu-dominio-front")
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
 
-app.UseHttpsRedirection();
+var app = builder.Build();
+//
+app.UseSwagger();
+app.UseSwaggerUI();
 
+app.UseCors("AllowFront");
 app.UseAuthorization();
+
+app.Urls.Add($"http://*:{port}");
 
 app.MapControllers();
 
