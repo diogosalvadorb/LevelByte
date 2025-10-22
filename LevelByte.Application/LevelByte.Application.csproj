@@ -6,4 +6,17 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Commands\ArticleCommands\DeleteArticle\" />
+    <Folder Include="Commands\ArticleCommands\UpdateArticle\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LevelByte.Core\LevelByte.Core.csproj" />
+  </ItemGroup>
+
 </Project>
