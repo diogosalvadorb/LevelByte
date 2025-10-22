@@ -9,8 +9,6 @@
   <ItemGroup>
     <Folder Include="Commands\ArticleCommands\DeleteArticle\" />
     <Folder Include="Commands\ArticleCommands\UpdateArticle\" />
-    <Folder Include="Queries\ArticleQueries\GetAllArticles\" />
-    <Folder Include="Queries\ArticleQueries\GetArticleById\" />
   </ItemGroup>
 
   <ItemGroup>
