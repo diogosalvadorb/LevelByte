@@ -18,12 +18,12 @@ export function Header() {
           <Link href="/articles" className="text-gray-300 hover:text-white hover:bg-gray-600 px-3 py-2 rounded transition">
             Articles
           </Link>
-          <button className="text-gray-300 hover:text-white hover:bg-gray-600 px-3 py-2 rounded transition">
+          <Link href="/about" className="text-gray-300 hover:text-white hover:bg-gray-600 px-3 py-2 rounded transition">
             About
-          </button>
-          <button className="text-gray-300 hover:text-white hover:bg-gray-600 px-3 py-2 rounded transition">
+          </Link>
+          <Link href="/contact" className="text-gray-300 hover:text-white hover:bg-gray-600 px-3 py-2 rounded transition">
             Contact
-          </button>         
+          </Link>         
           <div className="flex items-center gap-2">
             <input 
               type="text" 
