@@ -1,36 +1,70 @@
+"use client";
 import { ArticleCard } from "@/components/ArticleCard";
 import { Container } from "@/components/Container";
+import { useEffect, useState } from "react";
+import { ArticleCardData } from "@/types/article";
+import { apiService } from "@/api/api";
 
 export default function ArticlesPage() {
-  
-  const articles = [
-    {
-      title: "Titulo 1",
-      date: "2025-05-01",
-      content: "Conteudo do blog 1",
-      slug: "titulo-1",
-    },
-    {
-      title: "Titulo 2",
-      date: "2025-05-02",
-      content: "Conteudo do blog 2",
-      slug: "titulo-2",
-    },
-    {
-      title: "Titulo 3",
-      date: "2025-05-10",
-      content: "Conteudo do blog 3",
-      slug: "titulo-3", 
-    },
-  ];
+  const [articles, setArticles] = useState<ArticleCardData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchArticles() {
+      try {
+        setLoading(true);
+        const data = await apiService.fetchArticles();
+
+        const levelOneArticles: ArticleCardData[] = data
+          .map((article) => {
+            const levelOne = article.levels.find((lvl) => lvl.level === 1);
+            if (!levelOne) return null;
+
+            return {
+              id: article.id,
+              title: article.title,
+              date: new Date(article.createdAt).toLocaleDateString("pt-BR"),
+              content: levelOne.text,
+              image: "/placeholder.jpg",
+            };
+          })
+          .filter((a): a is ArticleCardData => Boolean(a));
+
+        setArticles(levelOneArticles);
+      } catch (err) {
+        setError("Failed to load articles. Please try again later.");
+        console.error("Error fetching articles:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchArticles();
+  }, []);
 
   return (
     <main className="bg-gray-900 text-white min-h-screen flex flex-col items-center">
       <Container>
-        <h1 className="text-3xl font-bold text-center mt-8 mb-8">Latest Articles</h1>
+        <h1 className="text-3xl font-bold text-center mt-8 mb-8">
+          Latest Articles
+        </h1>
+
+        {loading && (
+          <p className="text-center text-gray-400">Loading articles...</p>
+        )}
+
+        {error && (
+          <p className="text-center text-red-400">{error}</p>
+        )}
+
+        {!loading && !error && articles.length === 0 && (
+          <p className="text-center text-gray-400">No articles found.</p>
+        )}
+
         <div className="flex flex-col gap-6 items-center">
           {articles.map((article) => (
-            <ArticleCard key={article.slug} {...article} />
+            <ArticleCard key={article.id} {...article} />
           ))}
         </div>
       </Container>
