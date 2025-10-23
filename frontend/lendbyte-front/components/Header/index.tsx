@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { FaSearch } from "react-icons/fa";
 
 export function Header() {
@@ -11,12 +12,12 @@ export function Header() {
           LevelByte
         </h1>
         <nav className="flex items-center gap-3">
-          <button className="text-gray-300 hover:text-white hover:bg-gray-600 px-3 py-2 rounded transition">
+          <Link href="/homepage" className="text-gray-300 hover:text-white hover:bg-gray-600 px-3 py-2 rounded transition">
             Home
-          </button>
-          <button className="text-gray-300 hover:text-white hover:bg-gray-600 px-3 py-2 rounded transition">
+          </Link>
+          <Link href="/articles" className="text-gray-300 hover:text-white hover:bg-gray-600 px-3 py-2 rounded transition">
             Articles
-          </button>
+          </Link>
           <button className="text-gray-300 hover:text-white hover:bg-gray-600 px-3 py-2 rounded transition">
             About
           </button>
