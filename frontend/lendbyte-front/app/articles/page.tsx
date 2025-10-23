@@ -2,27 +2,25 @@ import { ArticleCard } from "@/components/ArticleCard";
 import { Container } from "@/components/Container";
 
 export default function ArticlesPage() {
+  
   const articles = [
     {
       title: "Titulo 1",
       date: "2025-05-01",
       content: "Conteudo do blog 1",
-      image: "/imagem.jpg",
-      slug: "redirecionamento/id",
+      slug: "titulo-1",
     },
     {
       title: "Titulo 2",
       date: "2025-05-02",
       content: "Conteudo do blog 2",
-      image: "/imagem.jpg",
-      slug: "redirecionamento/id",
+      slug: "titulo-2",
     },
     {
       title: "Titulo 3",
       date: "2025-05-10",
       content: "Conteudo do blog 3",
-      image: "/imagem.jpg",
-      slug: "redirecionamento/id",
+      slug: "titulo-3", 
     },
   ];
 
