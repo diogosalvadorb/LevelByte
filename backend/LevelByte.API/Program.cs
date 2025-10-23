@@ -22,20 +22,39 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFront", policy =>
-        policy.WithOrigins("https://meu-dominio-front")
-              .AllowAnyHeader()
-              .AllowAnyMethod());
+    {
+        if (builder.Environment.IsDevelopment())
+        {
+            policy.WithOrigins("http://localhost:3000")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        }
+        else
+        {     
+            policy.WithOrigins("https://meu-dominio-front")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        }
+    });
 });
 
 var app = builder.Build();
-//
-app.UseSwagger();
-app.UseSwaggerUI();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseCors("AllowFront");
 app.UseAuthorization();
 
 app.Urls.Add($"http://*:{port}");
+
+if (app.Environment.IsDevelopment())
+{
+    app.Urls.Add("http://localhost:8080");
+}
 
 app.MapControllers();
 
