@@ -10,31 +10,48 @@ class ApiService {
   }
 
   async fetchArticles(): Promise<Article[]> {
-  try {
-    const response = await fetch(`${this.baseUrl}/api/Articles`, { cache: "no-store" });
+    try {
+      const response = await fetch(`${this.baseUrl}/api/Articles`);
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch articles: ${response.statusText}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch articles: ${response.statusText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching articles:", error);
+      throw error;
     }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching articles:", error);
-    throw error;
   }
-}
-
 
   async fetchArticleById(id: string): Promise<Article | null> {
     try {
-      if (!id || typeof id !== 'string') {
-        console.error("Invalid article ID provided:", id);
-        return null;
+      try {
+        const response = await fetch(`${this.baseUrl}/api/Articles/${id}`);      
+
+        if (response.ok) {
+          const article = await response.json();
+          
+          if (!article || !article.levels || !Array.isArray(article.levels)) {
+            console.error("Invalid article structure:", article);
+            return null;
+          }
+
+          return article;
+        }
+      } catch (directFetchError) {
+        console.log("Direct fetch failed, trying to fetch from all articles...", directFetchError);
       }
 
       const articles = await this.fetchArticles();
       
-      return articles.find((article) => article.id === id) || null;
+      const article = articles.find((article) => article.id === id);
+      
+      if (!article) {
+        return null;
+      }
+
+      return article;
     } catch (error) {
       console.error("Error fetching article by ID:", error);
       return null;

@@ -3,7 +3,7 @@ import { FaSearch } from "react-icons/fa";
 
 export function Header() {
   return(
-    <header className="bg-gray-900 border-b">
+    <header className="bg-gray-950 border-b">
     <div className="container mx-auto px-6 py-4">
       <div className="flex items-center justify-between">
         <h1 
@@ -30,7 +30,7 @@ export function Header() {
               placeholder="Search" 
               className="bg-gray-800 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <button className="bg-blue-600 p-2 rounded-lg hover:bg-blue-700 transition">
+            <button className="bg-blue-600 p-2 rounded-lg hover:bg-blue-700 transition cursor-pointer">
               <FaSearch size={20} className="text-white" />
             </button>
           </div>

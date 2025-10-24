@@ -51,11 +51,6 @@ app.UseAuthorization();
 
 app.Urls.Add($"http://*:{port}");
 
-if (app.Environment.IsDevelopment())
-{
-    app.Urls.Add("http://localhost:8080");
-}
-
 app.MapControllers();
 
 app.Run();
