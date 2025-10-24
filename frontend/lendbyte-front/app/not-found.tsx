@@ -1,11 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Container } from "@/components/Container";
 
 export default function NotFound() {
   return (
     <main className="bg-gray-950 flex flex-col items-center justify-start min-h-screen">
-      <Container>
         <div className="relative w-full h-[80vh] mt-4 flex items-center justify-center text-center rounded-lg overflow-hidden">
           <Image
             src="/notfound.gif"
@@ -34,7 +32,6 @@ export default function NotFound() {
             </Link>
           </div>
         </div>
-      </Container>
     </main>
   );
 }

@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { apiService } from "@/api/api";
-import { Container } from "@/components/Container";
 import { ArticleDetail } from "@/components/ArticleDetail";
 
 interface PageProps {
@@ -18,13 +17,11 @@ export default async function ArticlePage({ params }: PageProps) {
 
   return (
     <main className="bg-gray-900 min-h-screen">
-      <Container>
         <div className="py-8 flex justify-center">
           <div className="w-full max-w-[700px]">
             <ArticleDetail article={article} />
           </div>
         </div>
-      </Container>
     </main>
   );
 }

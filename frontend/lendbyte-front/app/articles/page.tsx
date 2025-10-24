@@ -1,6 +1,5 @@
 "use client";
 import { ArticleCard } from "@/components/ArticleCard";
-import { Container } from "@/components/Container";
 import { useEffect, useState } from "react";
 import { ArticleCardData } from "@/types/article";
 import { apiService } from "@/api/api";
@@ -45,7 +44,6 @@ export default function ArticlesPage() {
 
   return (
     <main className="bg-gray-900 text-white min-h-screen flex flex-col items-center">
-      <Container>
         <h1 className="text-3xl font-bold text-center mt-8 mb-8">
           Latest Articles
         </h1>
@@ -67,7 +65,6 @@ export default function ArticlesPage() {
             <ArticleCard key={article.id} {...article} />
           ))}
         </div>
-      </Container>
     </main>
   );
 }
