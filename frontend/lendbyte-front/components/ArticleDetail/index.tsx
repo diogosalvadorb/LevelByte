@@ -31,19 +31,25 @@ export function ArticleDetail({ article }: ArticleDetailProps) {
   return (
     <main className="bg-gray-900 text-white min-h-screen flex flex-col items-center py-10">
       <Container>
+        
+        <div className="w-full max-w-[700px]">
+          <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            
+            <div className="mb-4">
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                {article.title}
+              </h1>
+            </div>
 
-      
-      <div className="w-full max-w-[700px]">
-        <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-
-          <div className="mb-4">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              {article.title}
-            </h1>
-
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
               <p className="text-gray-600 text-sm">
-                {new Date(article.createdAt).toLocaleDateString("pt-BR")}
+                {new Date(article.createdAt).toLocaleString("pt-BR", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
               </p>
 
               <div className="flex gap-2">
@@ -62,39 +68,40 @@ export function ArticleDetail({ article }: ArticleDetailProps) {
                 ))}
               </div>
             </div>
-          </div>
-
-
-          <div className="flex gap-4 mb-4">
-            <div className="shrink-0 w-50 h-28 relative">
-              <Image
-                src="/notfound.gif"
-                alt={article.title}
-                fill
-                className="object-cover rounded"
-              />
-            </div>
 
             {currentLevelData && (
-              <div className="flex-1">
-                <p className="text-gray-800 text-sm leading-relaxed">
-                  {currentLevelData.text}
-                </p>
+              <div className="text-gray-800 text-[15px] leading-relaxed">
+                <div className="relative w-48 h-32 float-left mr-4 mb-2">
+                  <Image
+                    src="/notfound.gif"
+                    alt={article.title}
+                    fill
+                    className="object-cover rounded-md"
+                  />
+                </div>
+
+                {currentLevelData.text.split("\n").map((paragraph, index) => (
+                  <p key={index} className="mb-3">
+                    {paragraph.trim().endsWith(".")
+                      ? paragraph.trim()
+                      : `${paragraph.trim()}.`}
+                  </p>
+                ))}
+
+                <div className="clear-both" />
+              </div>
+            )}
+
+            {currentLevelData?.audioUrl && (
+              <div className="mt-6 bg-gray-50 rounded-lg p-4">
+                <audio controls className="w-full">
+                  <source src={currentLevelData.audioUrl} type="audio/mpeg" />
+                  Your browser does not support the audio element.
+                </audio>
               </div>
             )}
           </div>
-
-          {currentLevelData && (
-            <div className="mt-6 bg-gray-50 rounded-lg p-4">
-              <audio controls className="w-full">
-                <source src={currentLevelData.audioUrl} type="audio/mpeg" />
-                Your browser does not support the audio element.
-              </audio>
-            </div>
-          )}
-          
         </div>
-      </div>
       </Container>
     </main>
   );

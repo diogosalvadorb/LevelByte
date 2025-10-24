@@ -20,7 +20,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFront", policy =>
-        policy.WithOrigins("https://meu-dominio-front")
+        policy.WithOrigins(
+            "http://localhost:3000",
+            "https://level-byte.vercel.app")
               .AllowAnyHeader()
               .AllowAnyMethod());
 });
