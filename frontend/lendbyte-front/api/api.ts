@@ -1,6 +1,6 @@
 import { Article } from "@/types/article";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
 
 class ApiService {
   private baseUrl: string;
