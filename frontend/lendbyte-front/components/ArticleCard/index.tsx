@@ -27,7 +27,7 @@ export function ArticleCard({ id, title, date, content }: ArticleCardProps) {
             <h2 className="font-medium text-lg text-blue-500 hover:underline">{title}</h2>
           </Link>
           <p className="text-sm text-gray-500">{date}</p>
-          <p className="text-gray-700 text-sm mt-2">{content}</p>
+          <p className="text-gray-700 text-sm mt-2 line-clamp-3">{content}</p>
         </div>
       </div>
     </div>
