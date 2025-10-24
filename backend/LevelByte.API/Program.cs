@@ -7,8 +7,6 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-
 builder.Services.AddDbContext<LevelByteDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Neon")));
 
@@ -30,12 +28,21 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 app.UseSwagger();
-app.UseSwaggerUI();
+
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "LevelByte API v1");
+    c.RoutePrefix = "swagger";
+});
 
 app.UseCors("AllowFront");
 app.UseAuthorization();
 
-app.Urls.Add($"http://*:{port}");
+if (!app.Environment.IsDevelopment())
+{
+    var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+    app.Urls.Add($"http://*:{port}");
+}
 
 app.MapControllers();
 
