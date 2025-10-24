@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Article } from "@/types/article";
-import { Container } from "../Container";
 
 interface ArticleDetailProps {
   article: Article;
@@ -29,9 +28,7 @@ export function ArticleDetail({ article }: ArticleDetailProps) {
   };
 
   return (
-    <main className="bg-gray-900 text-white min-h-screen flex flex-col items-center py-10">
-      <Container>
-        
+    <main className="bg-gray-900 text-white min-h-screen flex flex-col items-center py-10">  
         <div className="w-full max-w-[700px]">
           <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
             
@@ -102,7 +99,6 @@ export function ArticleDetail({ article }: ArticleDetailProps) {
             )}
           </div>
         </div>
-      </Container>
     </main>
   );
 }
