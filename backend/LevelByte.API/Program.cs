@@ -22,29 +22,15 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFront", policy =>
-    {
-        if (builder.Environment.IsDevelopment())
-        {
-            policy.WithOrigins("http://localhost:3000")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        }
-        else
-        {     
-            policy.WithOrigins("https://meu-dominio-front")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        }
-    });
+        policy.WithOrigins("https://meu-dominio-front")
+              .AllowAnyHeader()
+              .AllowAnyMethod());
 });
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseCors("AllowFront");
 app.UseAuthorization();
