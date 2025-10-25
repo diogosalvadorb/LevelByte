@@ -12,11 +12,8 @@ export function Header() {
           LevelByte
         </h1>
         <nav className="flex items-center gap-3">
-          <Link href="/homepage" className="text-gray-300 hover:text-white hover:bg-gray-600 px-3 py-2 rounded transition">
+          <Link href="/" className="text-gray-300 hover:text-white hover:bg-gray-600 px-3 py-2 rounded transition">
             Home
-          </Link>
-          <Link href="/articles" className="text-gray-300 hover:text-white hover:bg-gray-600 px-3 py-2 rounded transition">
-            Articles
           </Link>
           <Link href="/about" className="text-gray-300 hover:text-white hover:bg-gray-600 px-3 py-2 rounded transition">
             About

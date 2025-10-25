@@ -8,7 +8,7 @@ export default function About() {
         
         <div className="space-y-6 text-gray-300 leading-relaxed">
           <p className="text-lg">
-            Tech News in Levels is a learning platform designed to help people improve their English 
+            Levels Byte is a learning platform designed to help people improve their English 
             while exploring the world of technology.
           </p>
 
