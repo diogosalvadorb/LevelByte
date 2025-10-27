@@ -27,11 +27,11 @@ class ApiService {
   async fetchArticleById(id: string): Promise<Article | null> {
     try {
       try {
-        const response = await fetch(`${this.baseUrl}/api/Articles/${id}`);      
+        const response = await fetch(`${this.baseUrl}/api/Articles/${id}`);
 
         if (response.ok) {
           const article = await response.json();
-          
+
           if (!article || !article.levels || !Array.isArray(article.levels)) {
             console.error("Invalid article structure:", article);
             return null;
@@ -44,9 +44,9 @@ class ApiService {
       }
 
       const articles = await this.fetchArticles();
-      
+
       const article = articles.find((article) => article.id === id);
-      
+
       if (!article) {
         return null;
       }
@@ -56,6 +56,12 @@ class ApiService {
       console.error("Error fetching article by ID:", error);
       return null;
     }
+  }
+
+  getArticleImageUrl(id: string, hasImage: boolean): string {
+    return hasImage
+      ? `${this.baseUrl}/api/Articles/${id}/Image`
+      : "/placeholder";
   }
 }
 

@@ -20,12 +20,14 @@ export default function Home() {
             const levelOne = article.levels.find((lvl) => lvl.level === 1);
             if (!levelOne) return null;
 
+            const imageUrl = apiService.getArticleImageUrl(article.id, article.hasImage);
+
             return {
               id: article.id,
               title: article.title,
               date: new Date(article.createdAt).toLocaleDateString("pt-BR"),
               content: levelOne.text,
-              image: "/placeholder.jpg",
+              image: imageUrl,
             };
           })
           .filter((a): a is ArticleCardData => Boolean(a));
@@ -49,7 +51,7 @@ export default function Home() {
       </h1>
 
       {loading && (
-        <p className="text-center text-gray-400">Loading articles...</p>
+         <p className="text-center text-gray-400">Loading articles...</p>
       )}
 
       {error && (

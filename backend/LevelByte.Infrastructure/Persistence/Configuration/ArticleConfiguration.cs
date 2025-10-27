@@ -12,6 +12,12 @@ namespace LevelByte.Infrastructure.Persistence.Configuration
                    .IsRequired()
                    .HasMaxLength(200);
 
+            builder.Property(a => a.ImageData)
+                   .HasColumnType("bytea");
+
+            builder.Property(a => a.ImageContentType)
+                   .HasMaxLength(100);
+
             builder.HasMany(a => a.Levels)
                 .WithOne(l => l.Article!)
                 .HasForeignKey(l => l.ArticleId)

@@ -9,15 +9,17 @@ interface ArticleCardProps {
   image: string;
 }
 
-export function ArticleCard({ id, title, date, content }: ArticleCardProps) {
+export function ArticleCard({ id, title, date, content, image }: ArticleCardProps) {
   return (
     <div className="bg-white text-gray-900 rounded-md shadow-md p-4 flex w-[675px] gap-4 hover:scale-[1.02] transition-transform">
-      <div className="shrink-0 w-52 h-32 relative">
+      <div className="shrink-0 w-52 h-32 relative rounded-md">
         <Image
-          src="/notfound.gif"
+          src={image}
           alt={title}
           fill
           className="object-cover rounded-md"
+          unoptimized
+          priority
         />
       </div>
 

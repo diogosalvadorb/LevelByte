@@ -1,4 +1,5 @@
-﻿using LevelByte.Application.ViewModels;
+﻿using LevelByte.Application.Validators;
+using LevelByte.Application.ViewModels;
 using LevelByte.Core.Entities;
 using LevelByte.Core.Repository;
 using LevelByte.Core.Services;
@@ -19,7 +20,24 @@ namespace LevelByte.Application.Commands.ArticleCommands.CreateArticle
 
         public async Task<ArticleViewModel> Handle(CreateArticleCommand request, CancellationToken cancellationToken)
         {
-            var article = new Article(request.Title);
+            byte[]? imageData = null;
+            string? imageContentType = null;
+
+            if(request.Image != null)
+            {
+                var validation = ImageValidator.ValidateImage(request.Image);
+                if (!validation.IsValid)
+                {
+                    throw new InvalidOperationException(validation.ErrorMessage);
+                }
+
+                var imageResult = await ImageValidator.ProcessImage(request.Image);
+
+                imageData = imageResult.Data;
+                imageContentType = imageResult.ContentType;
+            }
+
+            var article = new Article(request.Title, imageData, imageContentType);
 
             var basicText = await _aiService.GenerateAiArticleTextAsync(request.Theme, 1);
             var basicWordCount = CountWords(basicText);
@@ -27,7 +45,8 @@ namespace LevelByte.Application.Commands.ArticleCommands.CreateArticle
             var basicLevel = new ArticleLevel(
                 article.Id,
                 1,
-                basicText,
+                // basicText,
+                GenerateOpenAIBasicText(request.Theme),
                 $"/audio/{article.Id}_basic.mp3",
                 basicWordCount
             );
@@ -38,7 +57,8 @@ namespace LevelByte.Application.Commands.ArticleCommands.CreateArticle
             var advancedLevel = new ArticleLevel(
                 article.Id,
                 2,
-                advancedText,
+                GenerateOpenAIAdvancedText(request.Theme),
+                //text: advancedText,
                 $"/audio/{article.Id}_advanced.mp3",
                 advancedWordCount
             );
@@ -70,6 +90,22 @@ namespace LevelByte.Application.Commands.ArticleCommands.CreateArticle
                 return 0;
 
             return text.Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Length;
+        }
+
+        private string GenerateOpenAIBasicText(string theme)
+        {
+            return $"This is a basic level article about {theme}. " +
+                   $"It uses simple words and short sentences. " +
+                   $"The vocabulary is easy to understand. " +
+                   $"This level is perfect for beginners learning English.";
+        }
+
+        private string GenerateOpenAIAdvancedText(string theme)
+        {
+            return $"This comprehensive article delves into the intricacies of {theme}. " +
+                   $"It employs sophisticated vocabulary and complex sentence structures. " +
+                   $"The content explores nuanced perspectives and demonstrates advanced linguistic patterns. " +
+                   $"This level challenges proficient English speakers to expand their understanding.";
         }
     }
 }

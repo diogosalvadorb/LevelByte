@@ -9,6 +9,7 @@ export interface ArticleLevel {
 export interface Article {
   id: string;
   title: string;
+  hasImage: boolean;
   createdAt: string;
   levels: ArticleLevel[];
 }
