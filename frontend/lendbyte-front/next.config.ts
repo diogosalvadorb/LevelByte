@@ -6,7 +6,7 @@ const nextConfig = {
         protocol: "http",
         hostname: "localhost",
         port: "5050",
-        pathname: "/api/articles/**",
+        pathname: "/api/Articles/**",
       },
     ],
     formats: ["image/avif", "image/webp"],

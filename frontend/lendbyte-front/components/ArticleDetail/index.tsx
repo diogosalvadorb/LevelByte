@@ -6,9 +6,10 @@ import { Article } from "@/types/article";
 
 interface ArticleDetailProps {
   article: Article;
+  imageUrl: string;
 }
 
-export function ArticleDetail({ article }: ArticleDetailProps) {
+export function ArticleDetail({ article, imageUrl }: ArticleDetailProps) {
   const [selectedLevel, setSelectedLevel] = useState(1);
 
   const currentLevelData = article.levels.find(
@@ -69,9 +70,10 @@ export function ArticleDetail({ article }: ArticleDetailProps) {
             <div className="text-gray-800 text-[15px] leading-relaxed">
               <div className="relative w-48 h-32 float-left mr-4 mb-2">
                 <Image
-                  src="/notfound.gif"
+                  src={imageUrl}
                   alt={article.title}
                   fill
+                  unoptimized
                   className="object-cover rounded-md"
                 />
               </div>

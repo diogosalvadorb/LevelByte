@@ -15,11 +15,13 @@ export default async function ArticlePage({ params }: PageProps) {
     notFound();
   }
 
+  const imageUrl = apiService.getArticleImageUrl(article.id, article.hasImage);
+
   return (
     <main className="bg-gray-900 min-h-screen">
         <div className="py-8 flex justify-center">
           <div className="w-full max-w-[700px]">
-            <ArticleDetail article={article} />
+            <ArticleDetail article={article} imageUrl={imageUrl} />
           </div>
         </div>
     </main>
