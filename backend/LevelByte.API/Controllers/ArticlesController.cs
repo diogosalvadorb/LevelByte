@@ -19,12 +19,6 @@ namespace LevelByte.API.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet("ping")]
-        public IActionResult Ping()
-        {
-            return Ok("Ping Api");
-        }
-
         [HttpPost]
         public async Task<IActionResult> Create([FromForm] CreateArticleCommand command)
         {
