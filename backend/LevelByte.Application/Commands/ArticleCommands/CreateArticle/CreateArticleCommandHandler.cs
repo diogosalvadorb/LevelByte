@@ -1,6 +1,7 @@
 ﻿using LevelByte.Application.ViewModels;
 using LevelByte.Core.Entities;
 using LevelByte.Core.Repository;
+using LevelByte.Core.Services;
 using MediatR;
 
 namespace LevelByte.Application.Commands.ArticleCommands.CreateArticle
@@ -8,28 +9,38 @@ namespace LevelByte.Application.Commands.ArticleCommands.CreateArticle
     public class CreateArticleCommandHandler : IRequestHandler<CreateArticleCommand, ArticleViewModel>
     {
         private readonly IArticleRepository _repository;
-        public CreateArticleCommandHandler(IArticleRepository repository)
+        private readonly IAiService _aiService;
+
+        public CreateArticleCommandHandler(IArticleRepository repository, IAiService aiService)
         {
             _repository = repository;
+            _aiService = aiService;
         }
+
         public async Task<ArticleViewModel> Handle(CreateArticleCommand request, CancellationToken cancellationToken)
         {
             var article = new Article(request.Title);
 
+            var basicText = await _aiService.GenerateAiArticleTextAsync(request.Theme, 1);
+            var basicWordCount = CountWords(basicText);
+
             var basicLevel = new ArticleLevel(
                 article.Id,
                 1,
-                GenerateOpenAIBasicText(request.Theme),
+                basicText,
                 $"/audio/{article.Id}_basic.mp3",
-                150
+                basicWordCount
             );
+
+            var advancedText = await _aiService.GenerateAiArticleTextAsync(request.Theme, 2);
+            var advancedWordCount = CountWords(advancedText);
 
             var advancedLevel = new ArticleLevel(
                 article.Id,
                 2,
-                GenerateOpenAIAdvancedText(request.Theme),
+                advancedText,
                 $"/audio/{article.Id}_advanced.mp3",
-                350
+                advancedWordCount
             );
 
             article.AddLevel(basicLevel);
@@ -53,21 +64,12 @@ namespace LevelByte.Application.Commands.ArticleCommands.CreateArticle
             };
         }
 
-        private string GenerateOpenAIBasicText(string theme)
+        private int CountWords(string text)
         {
-            return $"This is a basic level article about {theme}. " +
-                   $"It uses simple words and short sentences. " +
-                   $"The vocabulary is easy to understand. " +
-                   $"This level is perfect for beginners learning English.";
-        }
+            if (string.IsNullOrWhiteSpace(text))
+                return 0;
 
-        private string GenerateOpenAIAdvancedText(string theme)
-        {
-            return $"This comprehensive article delves into the intricacies of {theme}. " +
-                   $"It employs sophisticated vocabulary and complex sentence structures. " +
-                   $"The content explores nuanced perspectives and demonstrates advanced linguistic patterns. " +
-                   $"This level challenges proficient English speakers to expand their understanding.";
+            return text.Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Length;
         }
     }
 }
-
