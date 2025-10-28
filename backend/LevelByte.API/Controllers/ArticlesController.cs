@@ -1,6 +1,7 @@
 ﻿using LevelByte.Application.Commands.ArticleCommands.CreateArticle;
 using LevelByte.Application.Queries.ArticleQueries.GetAllArticles;
 using LevelByte.Application.Queries.ArticleQueries.GetArticleById;
+using LevelByte.Application.Queries.ArticleQueries.GetArticleImage;
 using LevelByte.Application.ViewModels;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -18,14 +19,8 @@ namespace LevelByte.API.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet("ping")]
-        public IActionResult Ping()
-        {
-            return Ok("Ping Api");
-        }
-
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateArticleCommand command)
+        public async Task<IActionResult> Create([FromForm] CreateArticleCommand command)
         {
             var result = await _mediator.Send(command);
             return Ok(result);
@@ -50,6 +45,18 @@ namespace LevelByte.API.Controllers
                 return NotFound();
 
             return Ok(result);
+        }
+
+        [HttpGet("{id}/image")]
+        public async Task<IActionResult> GetImage(Guid id)
+        {
+            var query = new GetArticleImageQuery(id);
+            var result = await _mediator.Send(query);
+
+            if (result == null)
+                return NotFound("Image not found");
+
+            return File(result.ImageData, result.ContentType);
         }
     }
 }

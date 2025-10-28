@@ -20,13 +20,15 @@ namespace LevelByte.Application.Queries.ArticleQueries.GetAllArticles
             {
                 Id = article.Id,
                 Title = article.Title,
+                HasImage = article.ImageData != null,
                 CreatedAt = article.CreatedAt,
                 Levels = article.Levels.Select(level => new ArticleLevelViewModel
                 {
                     Id = level.Id,
                     Level = level.Level,
                     Text = level.Text,
-                    AudioUrl = level.AudioUrl
+                    AudioUrl = level.AudioUrl,
+                    WordCount = level.WordCount
                 }).ToList()
             }).ToList();
         }

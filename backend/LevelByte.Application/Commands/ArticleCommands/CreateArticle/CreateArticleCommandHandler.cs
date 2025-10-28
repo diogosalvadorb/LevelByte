@@ -1,6 +1,8 @@
-﻿using LevelByte.Application.ViewModels;
+﻿using LevelByte.Application.Validators;
+using LevelByte.Application.ViewModels;
 using LevelByte.Core.Entities;
 using LevelByte.Core.Repository;
+using LevelByte.Core.Services;
 using MediatR;
 
 namespace LevelByte.Application.Commands.ArticleCommands.CreateArticle
@@ -8,28 +10,57 @@ namespace LevelByte.Application.Commands.ArticleCommands.CreateArticle
     public class CreateArticleCommandHandler : IRequestHandler<CreateArticleCommand, ArticleViewModel>
     {
         private readonly IArticleRepository _repository;
-        public CreateArticleCommandHandler(IArticleRepository repository)
+        private readonly IAiService _aiService;
+
+        public CreateArticleCommandHandler(IArticleRepository repository, IAiService aiService)
         {
             _repository = repository;
+            _aiService = aiService;
         }
+
         public async Task<ArticleViewModel> Handle(CreateArticleCommand request, CancellationToken cancellationToken)
         {
-            var article = new Article(request.Title);
+            byte[]? imageData = null;
+            string? imageContentType = null;
+
+            if(request.Image != null)
+            {
+                var validation = ImageValidator.ValidateImage(request.Image);
+                if (!validation.IsValid)
+                {
+                    throw new InvalidOperationException(validation.ErrorMessage);
+                }
+
+                var imageResult = await ImageValidator.ProcessImage(request.Image);
+
+                imageData = imageResult.Data;
+                imageContentType = imageResult.ContentType;
+            }
+
+            var article = new Article(request.Title, imageData, imageContentType);
+
+            var basicText = await _aiService.GenerateAiArticleTextAsync(request.Theme, 1);
+            var basicWordCount = CountWords(basicText);
 
             var basicLevel = new ArticleLevel(
                 article.Id,
                 1,
+                // basicText,
                 GenerateOpenAIBasicText(request.Theme),
                 $"/audio/{article.Id}_basic.mp3",
-                150
+                basicWordCount
             );
+
+            var advancedText = await _aiService.GenerateAiArticleTextAsync(request.Theme, 2);
+            var advancedWordCount = CountWords(advancedText);
 
             var advancedLevel = new ArticleLevel(
                 article.Id,
                 2,
                 GenerateOpenAIAdvancedText(request.Theme),
+                //text: advancedText,
                 $"/audio/{article.Id}_advanced.mp3",
-                350
+                advancedWordCount
             );
 
             article.AddLevel(basicLevel);
@@ -53,6 +84,14 @@ namespace LevelByte.Application.Commands.ArticleCommands.CreateArticle
             };
         }
 
+        private int CountWords(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return 0;
+
+            return text.Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Length;
+        }
+
         private string GenerateOpenAIBasicText(string theme)
         {
             return $"This is a basic level article about {theme}. " +
@@ -70,4 +109,3 @@ namespace LevelByte.Application.Commands.ArticleCommands.CreateArticle
         }
     }
 }
-
