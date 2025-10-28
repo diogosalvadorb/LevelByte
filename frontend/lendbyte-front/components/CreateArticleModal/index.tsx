@@ -1,9 +1,9 @@
 "use client";
 
-import { apiService } from "@/api/api";
 import { useState, ChangeEvent, FormEvent } from "react";
 import { FaTimes, FaUpload } from "react-icons/fa";
 import Image from "next/image";
+import { createArticle } from "@/lib/api";
 
 interface CreateArticleModalProps {
   isOpen: boolean;
@@ -69,7 +69,7 @@ export default function CreateArticleModal({
     setIsSubmitting(true);
 
     try {
-      await apiService.createArticle(
+      await createArticle(
         title.trim(),
         theme.trim(),
         image ?? undefined

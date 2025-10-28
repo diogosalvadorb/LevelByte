@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { apiService } from "@/api/api";
 import { Article } from "@/types/article";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import CreateArticleModal from "@/components/CreateArticleModal";
+import { fetchArticles } from "@/lib/api";
 
 export default function Dashboard() {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -18,7 +18,7 @@ export default function Dashboard() {
   const loadArticles = async () => {
     try {
       setLoading(true);
-      const data = await apiService.fetchArticles();
+      const data = await fetchArticles();
       setArticles(data);
     } catch (error) {
       console.error("Error loading articles:", error);

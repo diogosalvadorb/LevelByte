@@ -1,8 +1,8 @@
 "use client";
-import { ArticleCard } from "@/components/ArticleCard";
 import { useEffect, useState } from "react";
+import { ArticleCard } from "@/components/ArticleCard";
 import { ArticleCardData } from "@/types/article";
-import { apiService } from "@/api/api";
+import { fetchArticles, getArticleImageUrl } from "@/lib/api";
 
 export default function Home() {
   const [articles, setArticles] = useState<ArticleCardData[]>([]);
@@ -10,17 +10,17 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchArticles() {
+    async function loadArticles() {
       try {
         setLoading(true);
-        const data = await apiService.fetchArticles();
+        const data = await fetchArticles(); 
 
         const levelOneArticles: ArticleCardData[] = data
           .map((article) => {
             const levelOne = article.levels.find((lvl) => lvl.level === 1);
             if (!levelOne) return null;
 
-            const imageUrl = apiService.getArticleImageUrl(article.id, article.hasImage);
+            const imageUrl = getArticleImageUrl(article.id, article.hasImage);
 
             return {
               id: article.id,
@@ -41,7 +41,7 @@ export default function Home() {
       }
     }
 
-    fetchArticles();
+    loadArticles();
   }, []);
 
   return (
@@ -51,7 +51,7 @@ export default function Home() {
       </h1>
 
       {loading && (
-         <p className="text-center text-gray-400">Loading articles...</p>
+        <p className="text-center text-gray-400">Loading articles...</p>
       )}
 
       {error && (

@@ -21,7 +21,7 @@ namespace LevelByte.Application.Commands.UserCommands.CreateUser
             try
             {
                 var passWordHash = _authService.ComputerSha256Hash(request.PassWordHash);
-                var user = new User(request.FullName, request.Email, passWordHash, request.RoleCommand);
+                var user = new User(request.FullName, request.Email, passWordHash, request.Role);
 
                 await _userRepository.CreateUserAsync(user);
 
