@@ -20,7 +20,10 @@ export function Header() {
           </Link>
           <Link href="/contact" className="text-gray-300 hover:text-white hover:bg-gray-600 px-3 py-2 rounded transition">
             Contact
-          </Link>         
+          </Link>  
+          <Link href="/dashboard" className="text-gray-300 hover:text-white hover:bg-gray-600 px-3 py-2 rounded transition">
+            Dashboard
+          </Link>       
           <div className="flex items-center gap-2">
             <input 
               type="text" 

@@ -9,6 +9,26 @@ class ApiService {
     this.baseUrl = baseUrl;
   }
 
+  async createArticle(title: string, theme: string, image?: File): Promise<void> {
+  const formData = new FormData();
+  formData.append("Title", title);
+  formData.append("Theme", theme);
+  if (image) {
+    formData.append("Image", image);
+  }
+
+  const response = await fetch(`${this.baseUrl}/api/Articles`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to create article: ${errorText}`);
+  }
+}
+
+
   async fetchArticles(): Promise<Article[]> {
     try {
       const response = await fetch(`${this.baseUrl}/api/Articles`);
