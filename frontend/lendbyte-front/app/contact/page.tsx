@@ -1,111 +1,64 @@
-"use client";
-
-import { useState } from "react";
-
-export default function Contact() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
-    alert("Thank you for your message! We'll get back to you soon.");
-    setFormData({ name: "", email: "", subject: "", message: "" });
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
+export default function About() {
   return (
-    <main className="bg-gray-900 text-white min-h-screen">
-      <div className="max-w-3xl mx-auto px-6 py-12">
-        <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
-        <p className="text-gray-400 mb-8">
-          {`Have questions or feedback? We'd love to hear from you!`}
+    <main className="bg-gray-900 text-white min-h-screen flex flex-col items-center pt-20 px-6">
+      <h1 className="text-3xl md:text-4xl font-bold text-center mb-10 italic text-blue-400">
+        Quer entrar em contato ou enviar uma sugestão?
+        <br />
+        <span className="text-gray-400 text-2xl">
+          Want to get in touch or send a suggestion?
+        </span>
+      </h1>
+
+      <div className="bg-gray-800 border-l-4 border-blue-500 rounded-lg p-6 text-gray-300 shadow-lg max-w-3xl w-full mb-8">
+        <h2 className="text-xl font-semibold mb-4 italic text-blue-400">
+          🇧🇷 Português
+        </h2>
+
+        <p className="mb-4">
+          Envie um e-mail para{" "}
+          <span className="text-red-400 font-semibold">email@email.com</span>
+        </p>
+        <p className="mb-1">
+          <span className="font-semibold text-gray-200">Título:</span>{" "}
+          solicitação de conteúdo ou sugestão
+        </p>
+        <p>
+          <span className="font-semibold text-gray-200">Mensagem:</span>{" "}
+          uma descrição do que deseja enviar.
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium mb-2">
-              Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
-              placeholder="Your name"
-            />
-          </div>
+        <div className="border-t border-gray-700 my-4"></div>
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-2">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
-              placeholder="your.email@example.com"
-            />
-          </div>
+        <p className="text-sm text-gray-400">
+          O tempo de resposta varia conforme minha disponibilidade. <br />
+          Você receberá uma mensagem assim que eu estiver disponível.
+        </p>
+      </div>
 
-          <div>
-            <label htmlFor="subject" className="block text-sm font-medium mb-2">
-              Subject
-            </label>
-            <input
-              type="text"
-              id="subject"
-              name="subject"
-              value={formData.subject}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
-              placeholder="What's this about?"
-            />
-          </div>
+      <div className="bg-gray-800 border-l-4 border-blue-500 rounded-lg p-6 text-gray-300 shadow-lg max-w-3xl w-full">
+        <h2 className="text-xl font-semibold mb-4 italic text-blue-400">
+          🇺🇸 English
+        </h2>
 
-          <div>
-            <label htmlFor="message" className="block text-sm font-medium mb-2">
-              Message
-            </label>
-            <textarea
-              id="message"
-              name="message"
-              value={formData.message}
-              onChange={handleChange}
-              required
-              rows={6}
-              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white resize-none"
-              placeholder="Tell us what's on your mind..."
-            />
-          </div>
+        <p className="mb-4">
+          Send an email to{" "}
+          <span className="text-red-400 font-semibold">email@email.com</span>
+        </p>
+        <p className="mb-1">
+          <span className="font-semibold text-gray-200">Subject:</span> content
+          request or suggestion
+        </p>
+        <p>
+          <span className="font-semibold text-gray-200">Message:</span> a short
+          description of what you’d like to send.
+        </p>
 
-          <button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition cursor-pointer"
-          >
-            Send Message
-          </button>
-        </form>
+        <div className="border-t border-gray-700 my-4"></div>
+
+        <p className="text-sm text-gray-400">
+          Response time may vary depending on my availability. <br />
+          You will receive a message as soon as I am available.
+        </p>
       </div>
     </main>
   );
