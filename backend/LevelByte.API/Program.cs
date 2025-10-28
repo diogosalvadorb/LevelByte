@@ -2,6 +2,7 @@ using LevelByte.Application.Commands.ArticleCommands.CreateArticle;
 using LevelByte.Application.Services;
 using LevelByte.Core.Repository;
 using LevelByte.Core.Services;
+using LevelByte.Infrastructure.Auth;
 using LevelByte.Infrastructure.Persistence;
 using LevelByte.Infrastructure.Persistence.Repository;
 using MediatR;
@@ -14,9 +15,12 @@ builder.Services.AddDbContext<LevelByteDbContext>(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddHttpClient<IAiService, AiService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IArticleRepository, ArticleRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddMediatR(typeof(CreateArticleCommand));
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
