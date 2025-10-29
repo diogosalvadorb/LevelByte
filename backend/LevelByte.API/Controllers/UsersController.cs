@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LevelByte.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
     {

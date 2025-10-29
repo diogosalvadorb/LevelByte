@@ -66,6 +66,6 @@ export const login = async (
   email: string,
   password: string
 ): Promise<LoginResponse> => {
-  const response = await api.post("/api/users/login", { email, password });
+  const response = await api.post("/users/login", { email, password });
   return response.data;
 };
