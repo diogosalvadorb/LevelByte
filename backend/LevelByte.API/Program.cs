@@ -76,7 +76,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFront", policy =>
         policy.WithOrigins(
             "http://localhost:3000",
-            "https://level-byte.vercel.app")
+            "https://level-byte.vercel.app",
+            "https://level-byte-develop.vercel.app")
               .AllowAnyHeader()
               .AllowAnyMethod());
 });
