@@ -59,13 +59,13 @@ export const fetchArticleById = async (id: string): Promise<Article | null> => {
 
 export const getArticleImageUrl = (id: string, hasImage: boolean): string => {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
-  return hasImage ? `${baseUrl}/api/Articles/${id}/Image` : "/placeholder";
+  return hasImage ? `${baseUrl}/api/Articles/${id}/Image` : "/placeholder.jpg";
 };
 
 export const login = async (
   email: string,
   password: string
 ): Promise<LoginResponse> => {
-  const response = await api.post("/users/login", { email, password });
+  const response = await api.post("/api/users/login", { email, password });
   return response.data;
 };
