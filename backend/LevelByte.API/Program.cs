@@ -77,7 +77,7 @@ builder.Services.AddCors(options =>
         policy.WithOrigins(
             "http://localhost:3000",
             "https://level-byte.vercel.app",
-            "https://level-byte-git-develop-diogosalvadors-projects.vercel.app/")
+            "https://level-byte-git-develop-diogosalvadors-projects.vercel.app")
               .AllowAnyHeader()
               .AllowAnyMethod());
 });
