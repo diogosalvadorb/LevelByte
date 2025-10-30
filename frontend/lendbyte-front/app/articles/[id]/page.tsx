@@ -1,15 +1,45 @@
-import { notFound } from "next/navigation";
+"use client";
+
+import { useEffect, useState } from "react";
+import { notFound, useParams } from "next/navigation";
 import { ArticleDetail } from "@/components/ArticleDetail";
 import { fetchArticleById, getArticleImageUrl } from "@/lib/api";
+import { Article } from "@/types/article";
 
-interface PageProps {
-  params: Promise<{ id: string }>;
-}
+export default function ArticlePage() {
+  const params = useParams();
+  const id = params.id as string;
+  const [article, setArticle] = useState<Article | null>(null);
+  const [loading, setLoading] = useState(true);
 
-export default async function ArticlePage({ params }: PageProps) {
-  const { id } = await params;
-  
-  const article = await fetchArticleById(id);
+  const loadArticle = async () => {
+    setLoading(true);
+    const data = await fetchArticleById(id);
+    setArticle(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchArticleById(id);
+        setArticle(data);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <main className="bg-gray-900 min-h-screen flex items-center justify-center">
+        <div className="text-white text-xl">Loading article...</div>
+      </main>
+    );
+  }
 
   if (!article) {
     notFound();
@@ -18,12 +48,10 @@ export default async function ArticlePage({ params }: PageProps) {
   const imageUrl = getArticleImageUrl(article.id, article.hasImage);
 
   return (
-    <main className="bg-gray-900 min-h-screen">
-        <div className="py-8 flex justify-center">
-          <div className="w-full max-w-[700px]">
-            <ArticleDetail article={article} imageUrl={imageUrl} />
-          </div>
-        </div>
-    </main>
+    <ArticleDetail
+      article={article}
+      imageUrl={imageUrl}
+      onLevelUpdate={loadArticle}
+    />
   );
 }

@@ -35,6 +35,38 @@ export const createArticle = async (
   });
 };
 
+export const updateArticle = async (
+  id: string,
+  title: string,
+  image?: File,
+  removeImage?: boolean
+): Promise<void> => {
+  const formData = new FormData();
+  formData.append("Title", title);
+  if (image) formData.append("Image", image);
+  if (removeImage) formData.append("RemoveImage", "true");
+
+  await api.put(`/api/Articles/${id}`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+};
+
+export const updateArticleLevel = async (
+  articleId: string,
+  levelId: string,
+  text: string,
+  audioUrl: string
+): Promise<void> => {
+  await api.put(`/api/Articles/${articleId}/levels/${levelId}`, {
+    text,
+    audioUrl,
+  });
+};
+
+export const deleteArticle = async (id: string): Promise<void> => {
+  await api.delete(`/api/Articles/${id}`);
+};
+
 export const fetchArticles = async (): Promise<Article[]> => {
   const response = await api.get("/api/Articles");
   return response.data;

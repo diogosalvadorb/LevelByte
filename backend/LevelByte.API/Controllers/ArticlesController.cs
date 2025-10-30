@@ -1,10 +1,12 @@
 ﻿using LevelByte.Application.Commands.ArticleCommands.CreateArticle;
+using LevelByte.Application.Commands.ArticleCommands.DeleteArticle;
+using LevelByte.Application.Commands.ArticleCommands.UpdateArticle;
+using LevelByte.Application.Commands.ArticleCommands.UpdateArticleLevel;
 using LevelByte.Application.Queries.ArticleQueries.GetAllArticles;
 using LevelByte.Application.Queries.ArticleQueries.GetArticleById;
 using LevelByte.Application.Queries.ArticleQueries.GetArticleImage;
 using LevelByte.Application.ViewModels;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LevelByte.API.Controllers
@@ -57,6 +59,44 @@ namespace LevelByte.API.Controllers
                 return NotFound("Image not found");
 
             return File(result.ImageData, result.ContentType);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, [FromForm] UpdateArticleCommand command)
+        {
+            command.Id = id;
+            var result = await _mediator.Send(command);
+
+            if (result == null)
+                return NotFound();
+
+            return Ok(result);
+        }
+
+        [HttpPut("{articleId}/levels/{levelId}")]
+        public async Task<IActionResult> UpdateLevel(Guid articleId, Guid levelId, [FromBody] UpdateArticleLevelCommand command)
+        {
+            command.ArticleId = articleId;
+            command.LevelId = levelId;
+
+            var result = await _mediator.Send(command);
+
+            if (result == null)
+                return NotFound();
+
+            return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var command = new DeleteArticleCommand(id);
+            var result = await _mediator.Send(command);
+
+            if (!result)
+                return NotFound();
+
+            return NoContent();
         }
     }
 }
