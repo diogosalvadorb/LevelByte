@@ -7,5 +7,7 @@ namespace LevelByte.Core.Repository
         Task<Article?> GetArticleByIdAsync(Guid id);
         Task<List<Article>> GetAllAsync();
         Task<Article> CreateArticleAsync(Article entity);
+        Task<Article> UpdateArticleAsync(Article entity);
+        Task<bool> DeleteArticleAsync(Guid id);
     }
 }

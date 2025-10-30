@@ -20,5 +20,12 @@
         public string Text { get; private set; } = string.Empty;
         public string AudioUrl { get; private set; } = string.Empty;
         public int WordCount { get; private set; }
+
+        public void UpdateContent(string text, string audioUrl, int wordCount)
+        {
+            Text = text;
+            AudioUrl = audioUrl;
+            WordCount = wordCount;
+        }
     }
 }

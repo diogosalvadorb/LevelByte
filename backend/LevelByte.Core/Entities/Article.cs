@@ -25,6 +25,15 @@
             Levels.Add(level);
         }
 
+        public void UpdateTitle(string title)
+        {
+            Title = title;
+        }
 
+        public void UpdateImage(byte[]? imageData, string? imageContentType)
+        {
+            ImageData = imageData;
+            ImageContentType = imageContentType;
+        }
     }
 }

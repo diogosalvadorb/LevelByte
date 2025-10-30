@@ -34,5 +34,26 @@ namespace LevelByte.Infrastructure.Persistence.Repository
 
             return entity;
         }
+
+        public async Task<Article> UpdateArticleAsync(Article entity)
+        {
+            _context.Articles.Update(entity);
+            await _context.SaveChangesAsync();
+
+            return entity;
+        }
+
+        public async Task<bool> DeleteArticleAsync(Guid id)
+        {
+            var article = await GetArticleByIdAsync(id);
+
+            if (article == null)
+                return false;
+
+            _context.Articles.Remove(article);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }
