@@ -6,14 +6,20 @@ import { useRouter } from "next/navigation";
 import { Article } from "@/types/article";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import CreateArticleModal from "@/components/CreateArticleModal";
-import { fetchArticles } from "@/lib/api";
+import { fetchArticles, deleteArticle } from "@/lib/api";
+import UpdateArticleModal from "@/components/UpdateArticleModal";
+import DeleteConfirmationModal from "@/components/DeleteArticleModal";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -41,12 +47,33 @@ export default function Dashboard() {
     }
   };
 
-  const handleEdit = (articleId: string) => {
-    console.log("Edit article:", articleId);
+  const handleEdit = (article: Article) => {
+    setSelectedArticle(article);
+    setIsUpdateModalOpen(true);
   };
 
-  const handleDelete = (articleId: string) => {
-    console.log("Delete article:", articleId);
+  const handleDeleteClick = (article: Article) => {
+    setSelectedArticle(article);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedArticle) return;
+
+    try {
+      setIsDeleting(true);
+      await deleteArticle(selectedArticle.id);
+
+      setIsDeleteModalOpen(false);
+      setSelectedArticle(null);
+
+      loadArticles();
+    } catch (error) {
+      console.error("Error deleting article:", error);
+      alert("Failed to delete article. Please try again.");
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   if (status === "loading") {
@@ -56,11 +83,6 @@ export default function Dashboard() {
   if (session?.user.role !== "Admin") {
     return null;
   }
-
-  const handleCreateArticle = () => {
-    setIsModalOpen(false);
-    loadArticles();
-  };
 
   const getPreviewText = (article: Article): string => {
     const basicLevel = article.levels.find((level) => level.level === 1);
@@ -84,7 +106,7 @@ export default function Dashboard() {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Dashboard</h1>
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => setIsCreateModalOpen(true)}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors cursor-pointer"
           >
             <FaPlus />
@@ -137,14 +159,14 @@ export default function Dashboard() {
                     <td className="px-2 py-3">
                       <div className="flex justify-center gap-2">
                         <button
-                          onClick={() => handleEdit(article.id)}
+                          onClick={() => handleEdit(article)}
                           className="text-blue-400 hover:text-blue-300 transition-colors p-2 cursor-pointer"
                           title="Edit"
                         >
                           <FaEdit size={20} />
                         </button>
                         <button
-                          onClick={() => handleDelete(article.id)}
+                          onClick={() => handleDeleteClick(article)}
                           className="text-red-400 hover:text-red-300 transition-colors p-2 cursor-pointer"
                           title="Delete"
                         >
@@ -161,10 +183,35 @@ export default function Dashboard() {
       </div>
 
       <CreateArticleModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSuccess={handleCreateArticle}
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={loadArticles}
       />
+
+      {selectedArticle && (
+        <>
+          <UpdateArticleModal
+            isOpen={isUpdateModalOpen}
+            onClose={() => {
+              setIsUpdateModalOpen(false);
+              setSelectedArticle(null);
+            }}
+            onSuccess={loadArticles}
+            article={selectedArticle}
+          />
+
+          <DeleteConfirmationModal
+            isOpen={isDeleteModalOpen}
+            onClose={() => {
+              setIsDeleteModalOpen(false);
+              setSelectedArticle(null);
+            }}
+            onConfirm={handleDeleteConfirm}
+            articleTitle={selectedArticle.title}
+            isDeleting={isDeleting}
+          />
+        </>
+      )}
     </div>
   );
 }
