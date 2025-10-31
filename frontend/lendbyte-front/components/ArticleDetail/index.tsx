@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import { FaEdit } from "react-icons/fa";
 import { Article, ArticleLevel } from "@/types/article";
 import EditLevelModal from "../EditLevelModal";
-
+import AudioPlayer from "../AudioPlayer";
 
 interface ArticleDetailProps {
   article: Article;
@@ -14,7 +14,7 @@ interface ArticleDetailProps {
   onLevelUpdate?: () => void;
 }
 
-export function ArticleDetail({ article, imageUrl, onLevelUpdate }: ArticleDetailProps) {
+export function ArticleDetail({ article, imageUrl, onLevelUpdate}: ArticleDetailProps) {
   const { data: session } = useSession();
   const [selectedLevel, setSelectedLevel] = useState(1);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -87,7 +87,7 @@ export function ArticleDetail({ article, imageUrl, onLevelUpdate }: ArticleDetai
                     {getLevelLabel(level)}
                   </button>
                 ))}
-                
+
                 {isAdmin && currentLevelData && (
                   <button
                     onClick={() => handleEditLevel(currentLevelData)}
@@ -113,30 +113,26 @@ export function ArticleDetail({ article, imageUrl, onLevelUpdate }: ArticleDetai
                   />
                 </div>
 
-                {currentLevelData.text
-                  .split(/\n+/)
-                  .map((paragraph, index) => {
-                    const cleanParagraph = paragraph.trim();
+                {currentLevelData.text.split(/\n+/).map((paragraph, index) => {
+                  const cleanParagraph = paragraph.trim();
 
-                    if (!cleanParagraph) return null;
+                  if (!cleanParagraph) return null;
 
-                    return (
-                      <p key={index} className="mb-4">
-                        {cleanParagraph}
-                      </p>
-                    );
-                  })}
+                  return (
+                    <p key={index} className="mb-4">
+                      {cleanParagraph}
+                    </p>
+                  );
+                })}
 
                 <div className="clear-both" />
               </div>
             )}
 
             {currentLevelData?.audioUrl && (
-              <div className="mt-6 bg-gray-50 rounded-lg p-4">
-                <audio controls className="w-full">
-                  <source src={currentLevelData.audioUrl} type="audio/mpeg" />
-                  Your browser does not support the audio element.
-                </audio>
+              <div className="mt-6">
+                {/* <AudioPlayer src={currentLevelData.audioUrl} /> */}
+                <AudioPlayer src={currentLevelData.audioUrl} />
               </div>
             )}
           </div>
