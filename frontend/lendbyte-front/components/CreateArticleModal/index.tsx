@@ -193,7 +193,7 @@ export default function CreateArticleModal({
               )}
             </div>
             <p className="text-sm text-gray-400 mt-2">
-              Accepted formats: JPG, PNG, GIF. Max size: 5MB
+              Accepted formats: 1280x720 JPG, PNG, GIF. Max size: 5MB
             </p>
           </div>
 

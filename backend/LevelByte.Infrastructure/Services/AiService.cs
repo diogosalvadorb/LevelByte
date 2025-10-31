@@ -85,6 +85,8 @@ namespace LevelByte.Application.Services
                 {
                     throw new Exception("No article text generated from OpenAI response");
                 }
+                
+                articleText = CleanMarkdown(articleText);
 
                 return articleText;
             }
@@ -144,7 +146,27 @@ namespace LevelByte.Application.Services
             };
         }
 
-        public async Task<string> GenerateAudioAsync(string text, string voice = "onyx")
+        private static string CleanMarkdown(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return text;
+
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"(\*\*|__)(.*?)\1", "$2");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"(\*|_)(.*?)\1", "$2");
+
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"```[\s\S]*?```", string.Empty);
+
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"^#{1,6}\s*", string.Empty, System.Text.RegularExpressions.RegexOptions.Multiline);
+
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"^\s*>\s*", string.Empty, System.Text.RegularExpressions.RegexOptions.Multiline);
+
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"\n{2,}", "\n\n").Trim();
+
+            return text;
+        }
+
+
+        public async Task<string> GenerateAudioAsync(string text, string articleTitle, int level, string voice = "onyx")
         {
             try
             {
@@ -174,7 +196,9 @@ namespace LevelByte.Application.Services
 
                 await using var audioStream = await response.Content.ReadAsStreamAsync();
 
-                var publicUrl = await UploadToCloudflareR2Async(audioStream);
+                var fileReplaceName = $"{ReplaceFileName(articleTitle)}_{(level == 1 ? "basic" : "advanced")}_{DateTime.UtcNow:yyyyMMdd_HHmmss}.mp3";
+
+                var publicUrl = await UploadToCloudflareR2Async(audioStream, fileReplaceName);
 
                 Console.WriteLine($"Audio uploaded to R2: {publicUrl}");
                 return publicUrl;
@@ -186,7 +210,14 @@ namespace LevelByte.Application.Services
             }
         }
 
-        private async Task<string> UploadToCloudflareR2Async(Stream audioStream)
+        private static string ReplaceFileName(string name)
+        {
+            foreach (var c in Path.GetInvalidFileNameChars())
+                name = name.Replace(c, '_');
+            return name.Replace(" ", "_").ToLowerInvariant();
+        }
+
+        private async Task<string> UploadToCloudflareR2Async(Stream audioStream, string fileReplaceName)
         {
             var config = new AmazonS3Config
             {
@@ -202,7 +233,7 @@ namespace LevelByte.Application.Services
             await audioStream.CopyToAsync(memoryStream);
             memoryStream.Position = 0;
 
-            var fileName = $"levelbyte/audio_{DateTime.UtcNow:yyyyMMdd_HHmmss}.mp3";
+            var fileName = $"levelbyte/{fileReplaceName}";
             var uploadRequest = new PutObjectRequest
             {
                 BucketName = _bucket,
