@@ -40,6 +40,7 @@ namespace LevelByte.Application.Commands.ArticleCommands.CreateArticle
             var article = new Article(request.Title, imageData, imageContentType);
             // var basicText = await _aiService.GenerateAiArticleTextAsync(request.Theme, 1);
             var basicText = GenerateOpenAIBasicText(request.Theme);
+            var basicAudio = _aiService.GenerateAudioAsync(basicText);
             var basicWordCount = CountWords(basicText);
 
             var basicLevel = new ArticleLevel(

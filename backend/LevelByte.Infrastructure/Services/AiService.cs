@@ -129,6 +129,58 @@ namespace LevelByte.Application.Services
 
                 _ => $"Write an educational article about {input}."
             };
-        } 
+        }
+
+        public async Task<string> GenerateAudioAsync(string text, string voice = "onyx")
+        {
+            try
+            {
+                var request = new
+                {
+                    model = "gpt-4o-mini-tts", 
+                    input = text,
+                    voice = voice
+                };
+
+                var json = JsonSerializer.Serialize(request, _jsonOptions);
+                var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var httpRequest = new HttpRequestMessage(HttpMethod.Post, "https://api.openai.com/v1/audio/speech")
+                {
+                    Content = httpContent
+                };
+                httpRequest.Headers.Add("Authorization", $"Bearer {_openAiApiKey}");
+
+                var response = await _httpClient.SendAsync(httpRequest);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Failed to generate audio: {response.StatusCode} - {error}");
+                }
+
+                // salva local
+                var fileName = $"audio_{DateTime.UtcNow:yyyyMMdd_HHmmss}.mp3";
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "GeneratedAudios");
+
+                if (!Directory.Exists(filePath))
+                    Directory.CreateDirectory(filePath);
+
+                var fullPath = Path.Combine(filePath, fileName);
+
+                await using var audioStream = await response.Content.ReadAsStreamAsync();
+                await using var fileStream = File.Create(fullPath);
+
+                await audioStream.CopyToAsync(fileStream);
+
+                Console.WriteLine($"Audio successfully saved at: {fullPath}");
+                return fullPath;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error while generating audio: {ex.Message}");
+                throw;
+            }
+        }
     }
 }
