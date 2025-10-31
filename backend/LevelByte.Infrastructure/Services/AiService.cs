@@ -1,4 +1,7 @@
-﻿using LevelByte.Core.Services;
+﻿using Amazon;
+using Amazon.S3;
+using Amazon.S3.Model;
+using LevelByte.Core.Services;
 using LevelByte.Infrastructure.Services.Models;
 using Microsoft.Extensions.Configuration;
 using System.Text;
@@ -11,9 +14,10 @@ namespace LevelByte.Application.Services
         private readonly HttpClient _httpClient;
         private readonly string _openAiApiKey;
         private readonly JsonSerializerOptions _jsonOptions;
-
+        private readonly IConfiguration _configuration;
         public AiService(HttpClient httpClient, IConfiguration configuration)
         {
+            _configuration = configuration;
             _httpClient = httpClient;
             _openAiApiKey = configuration["OpenAi:ApiKey"] ?? "";
 
@@ -137,9 +141,10 @@ namespace LevelByte.Application.Services
             {
                 var request = new
                 {
-                    model = "gpt-4o-mini-tts", 
+                    model = "gpt-4o-mini-tts",
                     input = text,
-                    voice = voice
+                    voice = voice,
+                    format = "mp3"
                 };
 
                 var json = JsonSerializer.Serialize(request, _jsonOptions);
@@ -159,26 +164,48 @@ namespace LevelByte.Application.Services
                     throw new Exception($"Failed to generate audio: {response.StatusCode} - {error}");
                 }
 
-                // salva local
-                var fileName = $"audio_{DateTime.UtcNow:yyyyMMdd_HHmmss}.mp3";
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "GeneratedAudios");
-
-                if (!Directory.Exists(filePath))
-                    Directory.CreateDirectory(filePath);
-
-                var fullPath = Path.Combine(filePath, fileName);
-
                 await using var audioStream = await response.Content.ReadAsStreamAsync();
-                await using var fileStream = File.Create(fullPath);
 
-                await audioStream.CopyToAsync(fileStream);
+                var accountId = _configuration["CloudflareR2:AccountId"];
+                var accessKey = _configuration["CloudflareR2:AccessKeyId"];
+                var secretKey = _configuration["CloudflareR2:SecretAccessKey"];
+                var bucket = _configuration["CloudflareR2:BucketName"];
 
-                Console.WriteLine($"Audio successfully saved at: {fullPath}");
-                return fullPath;
+                var config = new AmazonS3Config
+                {
+                    ServiceURL = $"https://{accountId}.r2.cloudflarestorage.com",
+                    ForcePathStyle = true,
+                    SignatureVersion = "4",
+                    UseHttp = false
+                };
+
+
+                var s3Client = new AmazonS3Client(accessKey, secretKey, config);
+
+                await using var memoryStream = new MemoryStream();
+                await audioStream.CopyToAsync(memoryStream);
+                memoryStream.Position = 0;
+
+                var fileName = $"levelbyte/audio_{DateTime.UtcNow:yyyyMMdd_HHmmss}.mp3";
+                var uploadRequest = new PutObjectRequest
+                {
+                    BucketName = bucket,
+                    Key = fileName,
+                    InputStream = memoryStream,
+                    ContentType = "audio/mpeg",
+                    DisablePayloadSigning = true
+                };
+
+                var uploadResponse = await s3Client.PutObjectAsync(uploadRequest);
+
+                string publicUrl = $"{_configuration["CloudflareR2:PublicBaseUrl"].TrimEnd('/')}/{fileName}";
+
+                Console.WriteLine($"Audio uploaded to R2: {publicUrl}");
+                return publicUrl;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error while generating audio: {ex.Message}");
+                Console.WriteLine($"Error while generating or uploading audio: {ex.Message}");
                 throw;
             }
         }

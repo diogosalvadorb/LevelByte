@@ -96,10 +96,7 @@ namespace LevelByte.Application.Commands.ArticleCommands.CreateArticle
 
         private string GenerateOpenAIBasicText(string theme)
         {
-            return $"This is a basic level article about {theme}. " +
-                   $"It uses simple words and short sentences. " +
-                   $"The vocabulary is easy to understand. " +
-                   $"This level is perfect for beginners learning English.";
+            return $"This is a basic level article about {theme}. ";
         }
 
         private string GenerateOpenAIAdvancedText(string theme)
