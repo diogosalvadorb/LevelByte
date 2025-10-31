@@ -40,7 +40,7 @@ namespace LevelByte.Application.Commands.ArticleCommands.CreateArticle
             var article = new Article(request.Title, imageData, imageContentType);
             // var basicText = await _aiService.GenerateAiArticleTextAsync(request.Theme, 1);
             var basicText = GenerateOpenAIBasicText(request.Theme);
-            var basicAudio = await _aiService.GenerateAudioAsync(basicText);
+            var basicAudio = request.GenerateAudio ? await _aiService.GenerateAudioAsync(basicText) : string.Empty;
             var basicWordCount = CountWords(basicText);
 
             var basicLevel = new ArticleLevel(
@@ -55,15 +55,15 @@ namespace LevelByte.Application.Commands.ArticleCommands.CreateArticle
 
             // var advancedText = await _aiService.GenerateAiArticleTextAsync(request.Theme, 2);
             var advancedText = GenerateOpenAIAdvancedText(request.Theme);
-            var advancedcAudio = await _aiService.GenerateAudioAsync(advancedText);
+            var advancedAudio = request.GenerateAudio ? await _aiService.GenerateAudioAsync(advancedText) : string.Empty;
             var advancedWordCount = CountWords(advancedText);
 
             var advancedLevel = new ArticleLevel(
                 article.Id,
                 2,
                 //GenerateOpenAIAdvancedText(request.Theme),
-                advancedText, 
-                advancedcAudio,
+                advancedText,
+                advancedAudio,
                 //$"/audio/{article.Id}_advanced.mp3",
                 advancedWordCount
             );

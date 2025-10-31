@@ -4,6 +4,7 @@ using Amazon.S3.Model;
 using LevelByte.Core.Services;
 using LevelByte.Infrastructure.Services.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Identity.Client;
 using System.Text;
 using System.Text.Json;
 
@@ -14,12 +15,20 @@ namespace LevelByte.Application.Services
         private readonly HttpClient _httpClient;
         private readonly string _openAiApiKey;
         private readonly JsonSerializerOptions _jsonOptions;
-        private readonly IConfiguration _configuration;
+        private readonly string _accountId;
+        private readonly string _accessKey;
+        private readonly string _secretKey;
+        private readonly string _bucket;
+        private readonly string _publicBaseUrl;
         public AiService(HttpClient httpClient, IConfiguration configuration)
         {
-            _configuration = configuration;
             _httpClient = httpClient;
             _openAiApiKey = configuration["OpenAi:ApiKey"] ?? "";
+            _accountId = configuration["CloudflareR2:AccountId"] ?? "";
+            _accessKey = configuration["CloudflareR2:AccessKeyId"] ?? "";
+            _secretKey = configuration["CloudflareR2:SecretAccessKey"] ?? "";
+            _bucket = configuration["CloudflareR2:BucketName"] ?? "";
+            _publicBaseUrl = configuration["CloudflareR2:PublicBaseUrl"]?.TrimEnd('/') ?? "";
 
             _jsonOptions = new JsonSerializerOptions
             {
@@ -157,7 +166,6 @@ namespace LevelByte.Application.Services
                 httpRequest.Headers.Add("Authorization", $"Bearer {_openAiApiKey}");
 
                 var response = await _httpClient.SendAsync(httpRequest);
-
                 if (!response.IsSuccessStatusCode)
                 {
                     var error = await response.Content.ReadAsStringAsync();
@@ -166,39 +174,7 @@ namespace LevelByte.Application.Services
 
                 await using var audioStream = await response.Content.ReadAsStreamAsync();
 
-                var accountId = _configuration["CloudflareR2:AccountId"];
-                var accessKey = _configuration["CloudflareR2:AccessKeyId"];
-                var secretKey = _configuration["CloudflareR2:SecretAccessKey"];
-                var bucket = _configuration["CloudflareR2:BucketName"];
-
-                var config = new AmazonS3Config
-                {
-                    ServiceURL = $"https://{accountId}.r2.cloudflarestorage.com",
-                    ForcePathStyle = true,
-                    SignatureVersion = "4",
-                    UseHttp = false
-                };
-
-
-                var s3Client = new AmazonS3Client(accessKey, secretKey, config);
-
-                await using var memoryStream = new MemoryStream();
-                await audioStream.CopyToAsync(memoryStream);
-                memoryStream.Position = 0;
-
-                var fileName = $"levelbyte/audio_{DateTime.UtcNow:yyyyMMdd_HHmmss}.mp3";
-                var uploadRequest = new PutObjectRequest
-                {
-                    BucketName = bucket,
-                    Key = fileName,
-                    InputStream = memoryStream,
-                    ContentType = "audio/mpeg",
-                    DisablePayloadSigning = true
-                };
-
-                var uploadResponse = await s3Client.PutObjectAsync(uploadRequest);
-
-                string publicUrl = $"{_configuration["CloudflareR2:PublicBaseUrl"].TrimEnd('/')}/{fileName}";
+                var publicUrl = await UploadToCloudflareR2Async(audioStream);
 
                 Console.WriteLine($"Audio uploaded to R2: {publicUrl}");
                 return publicUrl;
@@ -208,6 +184,37 @@ namespace LevelByte.Application.Services
                 Console.WriteLine($"Error while generating or uploading audio: {ex.Message}");
                 throw;
             }
+        }
+
+        private async Task<string> UploadToCloudflareR2Async(Stream audioStream)
+        {
+            var config = new AmazonS3Config
+            {
+                ServiceURL = $"https://{_accountId}.r2.cloudflarestorage.com",
+                ForcePathStyle = true,
+                SignatureVersion = "4",
+                UseHttp = false
+            };
+
+            using var s3Client = new AmazonS3Client(_accessKey, _secretKey, config);
+
+            await using var memoryStream = new MemoryStream();
+            await audioStream.CopyToAsync(memoryStream);
+            memoryStream.Position = 0;
+
+            var fileName = $"levelbyte/audio_{DateTime.UtcNow:yyyyMMdd_HHmmss}.mp3";
+            var uploadRequest = new PutObjectRequest
+            {
+                BucketName = _bucket,
+                Key = fileName,
+                InputStream = memoryStream,
+                ContentType = "audio/mpeg",
+                DisablePayloadSigning = true
+            };
+
+            await s3Client.PutObjectAsync(uploadRequest);
+
+            return $"{_publicBaseUrl}/{fileName}";
         }
     }
 }
