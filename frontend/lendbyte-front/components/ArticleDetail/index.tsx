@@ -131,7 +131,6 @@ export function ArticleDetail({ article, imageUrl, onLevelUpdate}: ArticleDetail
 
             {currentLevelData?.audioUrl && (
               <div className="mt-6">
-                {/* <AudioPlayer src={currentLevelData.audioUrl} /> */}
                 <AudioPlayer src={currentLevelData.audioUrl} />
               </div>
             )}

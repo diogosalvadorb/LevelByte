@@ -8,7 +8,7 @@ interface AudioWavePlayerProps {
   src: string;
 }
 
-export default function AudioWavePlayer({ src }: AudioWavePlayerProps) {
+export default function AudioPlayer({ src }: AudioWavePlayerProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const waveSurferRef = useRef<WaveSurfer | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
