@@ -25,20 +25,20 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddMediatR(typeof(CreateArticleCommand));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
 
-                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                        ValidAudience = builder.Configuration["Jwt:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
-                    };
-                });
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+        };
+    });
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -71,26 +71,32 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+var allowedOrigin = builder.Configuration["ALLOWED_ORIGIN"] ?? builder.Configuration["AllowedOrigin"];
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFront", policy =>
-        policy.WithOrigins(
-            "http://localhost:3000",
-            "https://level-byte.vercel.app",
-            "https://level-byte-git-develop-diogosalvadors-projects.vercel.app")
-              .AllowAnyHeader()
-              .AllowAnyMethod());
+    {
+        if (!string.IsNullOrEmpty(allowedOrigin))
+        {
+            policy.WithOrigins(allowedOrigin)
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        }
+    });
 });
 
 var app = builder.Build();
 
-app.UseSwagger();
-
-app.UseSwaggerUI(c =>
+if (app.Environment.IsDevelopment())
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "LevelByte API v1");
-    c.RoutePrefix = "swagger";
-});
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "LevelByte API v1");
+        c.RoutePrefix = "swagger";
+    });
+}
 
 app.UseCors("AllowFront");
 app.UseAuthorization();
@@ -102,5 +108,4 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
-
 app.Run();
