@@ -16,7 +16,7 @@ export default function About() {
 
         <p className="mb-4">
           Envie um e-mail para{" "}
-          <span className="text-red-400 font-semibold">email@email.com</span>
+          <span className="text-red-400 font-semibold">diogosalvadorb@gmail.com</span>
         </p>
         <p className="mb-1">
           <span className="font-semibold text-gray-200">Título:</span>{" "}
@@ -42,7 +42,7 @@ export default function About() {
 
         <p className="mb-4">
           Send an email to{" "}
-          <span className="text-red-400 font-semibold">email@email.com</span>
+          <span className="text-red-400 font-semibold">diogosalvadorb@gmail.com</span>
         </p>
         <p className="mb-1">
           <span className="font-semibold text-gray-200">Subject:</span> content

@@ -38,33 +38,30 @@ namespace LevelByte.Application.Commands.ArticleCommands.CreateArticle
             }
 
             var article = new Article(request.Title, imageData, imageContentType);
-            // var basicText = await _aiService.GenerateAiArticleTextAsync(request.Theme, 1);
-            var basicText = GenerateOpenAIBasicText(request.Theme);
-            var basicAudio = await _aiService.GenerateAudioAsync(basicText);
+
+            var basicText = await _aiService.GenerateAiArticleTextAsync(request.Theme, 1);
+            var basicAudio = request.GenerateAudio ? await _aiService.GenerateAudioAsync(basicText, request.Title, 1) : string.Empty;
+
             var basicWordCount = CountWords(basicText);
 
             var basicLevel = new ArticleLevel(
                 article.Id,
                 1,
                 basicText,
-                //GenerateOpenAIBasicText(request.Theme),
-                //$"/audio/{article.Id}_basic.mp3",
                 basicAudio,
                 basicWordCount
             );
 
-            // var advancedText = await _aiService.GenerateAiArticleTextAsync(request.Theme, 2);
-            var advancedText = GenerateOpenAIAdvancedText(request.Theme);
-            var advancedcAudio = await _aiService.GenerateAudioAsync(advancedText);
+            var advancedText = await _aiService.GenerateAiArticleTextAsync(request.Theme, 2);
+            var advancedAudio = request.GenerateAudio ? await _aiService.GenerateAudioAsync(advancedText, article.Title, 2) : string.Empty;
+
             var advancedWordCount = CountWords(advancedText);
 
             var advancedLevel = new ArticleLevel(
                 article.Id,
                 2,
-                //GenerateOpenAIAdvancedText(request.Theme),
-                advancedText, 
-                advancedcAudio,
-                //$"/audio/{article.Id}_advanced.mp3",
+                advancedText,
+                advancedAudio,
                 advancedWordCount
             );
 

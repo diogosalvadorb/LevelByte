@@ -20,6 +20,7 @@ export default function CreateArticleModal({
   const [theme, setTheme] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
+  const [generateAudio, setGenerateAudio] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -72,6 +73,7 @@ export default function CreateArticleModal({
       await createArticle(
         title.trim(),
         theme.trim(),
+        generateAudio,
         image ?? undefined
       );
 
@@ -79,6 +81,7 @@ export default function CreateArticleModal({
       setTheme("");
       setImage(null);
       setImagePreview("");
+      setGenerateAudio(true);
 
       onSuccess();
     } catch (err) {
@@ -94,6 +97,7 @@ export default function CreateArticleModal({
       setTheme("");
       setImage(null);
       setImagePreview("");
+      setGenerateAudio(true);
       setError("");
       onClose();
     }
@@ -189,7 +193,7 @@ export default function CreateArticleModal({
               )}
             </div>
             <p className="text-sm text-gray-400 mt-2">
-              Accepted formats: JPG, PNG, GIF. Max size: 5MB
+              Accepted formats: 1280x720 JPG, PNG, GIF. Max size: 5MB
             </p>
           </div>
 
@@ -211,6 +215,30 @@ export default function CreateArticleModal({
             />
             <p className="text-sm text-gray-400 mt-2">
               {theme.length} / 5000 characters
+            </p>
+          </div>
+
+          <div className="bg-gray-700 rounded-lg p-4 border border-gray-600">
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="generateAudio"
+                checked={generateAudio}
+                onChange={(e) => setGenerateAudio(e.target.checked)}
+                disabled={isSubmitting}
+                className="w-5 h-5 text-blue-600 bg-gray-600 border-gray-500 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
+              />
+              <label
+                htmlFor="generateAudio"
+                className="text-sm font-medium text-gray-200 cursor-pointer"
+              >
+                Generate audio for articles
+              </label>
+            </div>
+            <p className="text-xs text-gray-400 mt-2 ml-8">
+              {generateAudio 
+                ? "AI will generate audio narration for both Basic and Advanced levels (may take a few moments)"
+                : "Articles will be created without audio. You can add audio later if needed."}
             </p>
           </div>
 

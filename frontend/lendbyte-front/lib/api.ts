@@ -23,11 +23,13 @@ api.interceptors.request.use(
 export const createArticle = async (
   title: string,
   theme: string,
+  generateAudio: boolean,
   image?: File
 ): Promise<void> => {
   const formData = new FormData();
   formData.append("Title", title);
   formData.append("Theme", theme);
+  formData.append("GenerateAudio", generateAudio.toString());
   if (image) formData.append("Image", image);
 
   await api.post("/api/Articles", formData, {
