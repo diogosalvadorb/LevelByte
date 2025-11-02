@@ -6,6 +6,7 @@ using LevelByte.Application.Queries.ArticleQueries.GetAllArticles;
 using LevelByte.Application.Queries.ArticleQueries.GetArticleById;
 using LevelByte.Application.ViewModels;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LevelByte.API.Controllers
@@ -18,13 +19,6 @@ namespace LevelByte.API.Controllers
         public ArticlesController(IMediator mediator)
         {
             _mediator = mediator;
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Create([FromForm] CreateArticleCommand command)
-        {
-            var result = await _mediator.Send(command);
-            return Ok(result);
         }
 
         [HttpGet]
@@ -51,8 +45,17 @@ namespace LevelByte.API.Controllers
 
             return Ok(result);
         }
-   
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Create([FromForm] CreateArticleCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(Guid id, [FromForm] UpdateArticleCommand command)
         {
             command.Id = id;
@@ -65,6 +68,7 @@ namespace LevelByte.API.Controllers
         }
 
         [HttpPut("{articleId}/levels/{levelId}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateLevel(Guid articleId, Guid levelId, [FromBody] UpdateArticleLevelCommand command)
         {
             command.ArticleId = articleId;
@@ -79,6 +83,7 @@ namespace LevelByte.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(Guid id)
         {
             var command = new DeleteArticleCommand(id);

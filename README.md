@@ -128,7 +128,8 @@ Acesse a aplicação em
      ```
 🔐 Credenciais de Acesso Administrativo
    ```bash
-    http://localhost:3000/Login: admin@levelsbyte.com
+    localhohttp://localhost:3000/login
+    Login: admin@levelsbyte.com
     Senha: Admin@123
    ```
 
