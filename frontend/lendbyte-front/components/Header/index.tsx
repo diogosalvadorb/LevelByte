@@ -1,21 +1,24 @@
 'use client';
 
-import Link from "next/link";
-import { FaSearch, FaUser } from "react-icons/fa";
-import { useSession, signOut } from "next-auth/react";
-import { useState, useCallback, FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import Link from 'next/link';
+import { FaSearch, FaUser } from 'react-icons/fa';
+import { useSession, signOut } from 'next-auth/react';
+import { useState, useCallback, FormEvent, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-export function Header() {
+function HeaderContent() {
   const { data: session } = useSession();
   const user = session?.user;
   const router = useRouter();
-  const [searchTerm, setSearchTerm] = useState("");
+  const searchParams = useSearchParams();
+
+  const [searchTerm, setSearchTerm] = useState(() => searchParams.get('search') || '');
 
   const handleSearch = useCallback((e: FormEvent) => {
     e.preventDefault();
-    const term = searchTerm.trim();
-    router.push(term ? `/?search=${encodeURIComponent(term)}` : "/");
+
+    const trimmed = searchTerm.trim();
+    router.push(trimmed ? `/?search=${encodeURIComponent(trimmed)}` : '/');
   }, [searchTerm, router]);
 
   return (
@@ -25,6 +28,7 @@ export function Header() {
           <Link href="/" className="text-2xl font-bold text-white cursor-pointer hover:text-blue-400 transition">
             LevelByte
           </Link>
+
           <nav className="flex items-center gap-3">
             <Link
               href="/"
@@ -46,10 +50,10 @@ export function Header() {
             </Link>
 
             {user?.role === "Admin" && (
-              <Link 
-                href="/dashboard" 
+              <Link
+                href="/dashboard"
                 className="text-gray-300 hover:text-white hover:bg-gray-600 px-3 py-2 rounded transition"
-                >
+              >
                 Dashboard
               </Link>
             )}
@@ -62,9 +66,9 @@ export function Header() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="bg-gray-800 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-48"
               />
-              <button 
-              type="submit" 
-              className="bg-blue-600 p-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
+              <button
+                type="submit"
+                className="bg-blue-600 p-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
               >
                 <FaSearch size={20} className="text-white" />
               </button>
@@ -85,5 +89,13 @@ export function Header() {
         </div>
       </div>
     </header>
+  );
+}
+
+export function Header() {
+  return (
+    <Suspense fallback={<div className="text-gray-400 p-4 text-center">Loading header...</div>}>
+      <HeaderContent />
+    </Suspense>
   );
 }
