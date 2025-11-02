@@ -1,12 +1,12 @@
 "use client";
-import { useEffect, useState, FormEvent } from "react";
+import { useEffect, useState, FormEvent, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ArticleCard } from "@/components/ArticleCard";
 import { ArticleCardData } from "@/types/article";
 import { fetchArticles, getArticleImageUrl } from "@/lib/api";
 import Link from "next/link";
 
-export default function Home() {
+function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const termFromUrl = searchParams.get("search") || "";
@@ -122,5 +122,22 @@ export default function Home() {
         )}
       </div>
     </main>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={
+      <main className="bg-gray-900 text-white min-h-screen flex flex-col items-center py-10 px-4">
+        <div className="w-full max-w-6xl">
+          <h1 className="text-3xl font-bold mb-8 text-center md:text-left">
+            Latest Articles
+          </h1>
+          <p className="text-center text-gray-400">Loading articles...</p>
+        </div>
+      </main>
+    }>
+      <HomeContent />
+    </Suspense>
   );
 }
