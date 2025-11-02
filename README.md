@@ -14,10 +14,10 @@ Ideal para quem quer aprender inglês técnico de forma prática. Aprenda tecnol
 
 ## 📑 Índice
 
-- [Funcionalidades](#Funcionalidades)
-- [Pré-requisitos](#Pré-requisitos)
-- [Como Instalar e Executar o Projeto](#Como-instalar-e-executar-o-projeto)
-- [Serviços Externos](#Infraestrutura-e-Serviços)
+- [Funcionalidades](#funcionalidades)
+- [Pré-requisitos](#pré-requisitos)
+- [Como Instalar e Executar o Projeto](#como-instalar-e-executar-o-projeto)
+- [Infraestrutura e Serviços](#infraestrutura-e-serviços)
 
 ## ⚙️ Funcionalidades
 
