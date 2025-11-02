@@ -1,27 +1,22 @@
-"use client";
+'use client';
 
 import Link from "next/link";
 import { FaSearch, FaUser } from "react-icons/fa";
 import { useSession, signOut } from "next-auth/react";
-import { useState, FormEvent } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useCallback, FormEvent } from "react";
+import { useRouter } from "next/navigation";
 
 export function Header() {
   const { data: session } = useSession();
   const user = session?.user;
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const [searchTerm, setSearchTerm] = useState(searchParams.get("search") || "");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const handleSearch = (e: FormEvent) => {
+  const handleSearch = useCallback((e: FormEvent) => {
     e.preventDefault();
-    
-    if (searchTerm.trim()) {
-      router.push(`/?search=${encodeURIComponent(searchTerm.trim())}`);
-    } else {
-      router.push("/");
-    }
-  };
+    const term = searchTerm.trim();
+    router.push(term ? `/?search=${encodeURIComponent(term)}` : "/");
+  }, [searchTerm, router]);
 
   return (
     <header className="bg-gray-950 border-b">
@@ -51,10 +46,10 @@ export function Header() {
             </Link>
 
             {user?.role === "Admin" && (
-              <Link
-                href="/dashboard"
+              <Link 
+                href="/dashboard" 
                 className="text-gray-300 hover:text-white hover:bg-gray-600 px-3 py-2 rounded transition"
-              >
+                >
                 Dashboard
               </Link>
             )}
@@ -68,8 +63,8 @@ export function Header() {
                 className="bg-gray-800 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-48"
               />
               <button 
-                type="submit"
-                className="bg-blue-600 p-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
+              type="submit" 
+              className="bg-blue-600 p-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
               >
                 <FaSearch size={20} className="text-white" />
               </button>
