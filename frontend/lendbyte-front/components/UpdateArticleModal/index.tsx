@@ -153,10 +153,10 @@ export default function UpdateArticleModal({
               Image (Optional)
             </label>
             <div className="flex flex-col gap-4">
-              {!removeImage && article.hasImage && !imagePreview && (
+              {!removeImage && article.imageUrl && !imagePreview && (
                 <div className="relative">
                   <Image
-                    src={`${process.env.NEXT_PUBLIC_API_URL}/api/Articles/${article.id}/Image`}
+                    src={article.imageUrl}
                     alt="Current"
                     width={800}
                     height={400}

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { notFound, useParams } from "next/navigation";
 import { ArticleDetail } from "@/components/ArticleDetail";
-import { fetchArticleById, getArticleImageUrl } from "@/lib/api";
+import { fetchArticleById } from "@/lib/api";
 import { Article } from "@/types/article";
 
 export default function ArticlePage() {
