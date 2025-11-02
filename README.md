@@ -3,21 +3,22 @@ Projeto simplifica artigos e notícias de tecnologia, do português ou inglês, 
 Ideal para quem quer aprender inglês técnico de forma prática. Aprenda tecnologia e inglês ao mesmo tempo.
 
 🌐 **Acesse o projeto online:**  
-👉 [https://level-byte.vercel.app/](https://level-byte.vercel.app/)
+👉 <a href="https://level-byte.vercel.app/" target="_blank">https://level-byte.vercel.app/</a>
 
 ### ☁️ Publicação da Infraestrutura
 
-- 🚀 **Back-End (.NET 8 API)** — publicado na [**Fly.io**](https://fly.io/)  
-- 💻 **Front-End (Next.js 16)** — publicado na [**Vercel**](https://vercel.com/)  
-- 🗄️ **Banco de Dados (PostgreSQL)** — hospedado na [**Neon**](https://neon.tech/)
-- ⚙️ **CI/CD Automático** — implementado com [**GitHub Actions**](https://github.com/features/actions) para integração e deploy contínuo
+- 🚀 **Back-End (.NET 8 API)** — publicado na <a href="https://fly.io/" target="_blank">**Fly.io**</a>  
+- 💻 **Front-End (Next.js 16)** — publicado na <a href="https://vercel.com/" target="_blank">**Vercel**</a>  
+- 🗄️ **Banco de Dados (PostgreSQL)** — hospedado na <a href="https://neon.tech/" target="_blank">**Neon**</a>  
+- ⚙️ **CI/CD Automático** — implementado com <a href="https://github.com/features/actions" target="_blank">**GitHub Actions**</a>
 
 ## 📑 Índice
 
-- [Funcionalidades](#funcionalidades)
-- [Pré-requisitos](#pré-requisitos)
-- [Como Instalar e Executar o Projeto](#como-instalar-e-executar-o-projeto)
-- [Infraestrutura e Serviços](#infraestrutura-e-serviços)
+- [Funcionalidades](#️-funcionalidades)
+- [Pré-requisitos](#-pré-requisitos)
+- [Como Instalar e Executar o Projeto](#-como-instalar-e-executar-o-projeto)
+- [Infraestrutura e Serviços](#-infraestrutura-e-serviços)
+
 
 ## ⚙️ Funcionalidades
 
@@ -135,9 +136,10 @@ Acesse a aplicação em
 
 ### 🌍 Infraestrutura e Serviços
 
-- 🚀 **[Fly.io](https://fly.io/)** — Hospedagem do **Back-End (.NET 8 API)**  
-- 💻 **[Vercel](https://vercel.com/)** — Hospedagem do **Front-End (Next.js 16)**  
-- 🗄️ **[Neon PostgreSQL](https://neon.tech/)** — Banco de dados PostgreSQL hospedado em nuvem  
-- 🔊 **[OpenAI](https://platform.openai.com/docs/api-reference/introduction/)** — Geração de texto e áudio com IA  
-- ☁️ **[Cloudflare Dashboard](https://developers.cloudflare.com/r2/)** — Armazenamento de áudios e imagens
+- 🚀 **Back-End (.NET 8 API)** — publicado na <a href="https://fly.io/" target="_blank">**Fly.io**</a>  
+- 💻 **Front-End (Next.js 16)** — publicado na <a href="https://vercel.com/" target="_blank">**Vercel**</a>  
+- 🗄️ **Banco de Dados (PostgreSQL)** — hospedado na <a href="https://neon.tech/" target="_blank">**Neon**</a>  
+- 🔊 **OpenAI** — <a href="https://platform.openai.com/docs/api-reference/introduction/" target="_blank">Geração de texto e áudio com IA</a>  
+- ☁️ **Cloudflare R2** — <a href="https://developers.cloudflare.com/r2/" target="_blank">Armazenamento de áudios e imagens</a>
+- 🔁 **CI/CD Automático** — configurado com <a href="https://github.com/features/actions" target="_blank">**GitHub Actions**</a> 
 
