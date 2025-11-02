@@ -25,7 +25,7 @@ export default function Home() {
             const levelOne = article.levels.find((lvl) => lvl.level === 1);
             if (!levelOne) return null;
 
-            const imageUrl = getArticleImageUrl(article.id, article.hasImage);
+            const imageUrl = getArticleImageUrl(article.imageUrl);
 
             return {
               id: article.id,

@@ -214,7 +214,7 @@ namespace LevelByte.Application.Services
                 var extension = Path.GetExtension(fileName).ToLowerInvariant();
                 var fullFileName = $"{sanitizedFileName}_{timestamp}{extension}";
 
-                var publicUrl = await UploadToCloudflareR2Async(imageStream, fullFileName, contentType, "levelByte-img");
+                var publicUrl = await UploadToCloudflareR2Async(imageStream, fullFileName, contentType, "levelbyte-img");
 
                 Console.WriteLine($"Image uploaded to R2: {publicUrl}");
                 return publicUrl;

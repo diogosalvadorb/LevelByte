@@ -25,6 +25,7 @@ namespace LevelByte.Application.Queries.ArticleQueries.GetAllArticles
             {
                 Id = article.Id,
                 Title = article.Title,
+                ImageUrl = article.ImageUrl,
                 CreatedAt = article.CreatedAt,
                 Levels = article.Levels.Select(level => new ArticleLevelViewModel
                 {
