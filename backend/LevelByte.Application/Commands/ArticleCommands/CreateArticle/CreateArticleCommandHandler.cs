@@ -38,10 +38,10 @@ namespace LevelByte.Application.Commands.ArticleCommands.CreateArticle
 
             var article = new Article(request.Title, imageUrl);
 
-            //var basicText = await _aiService.GenerateAiArticleTextAsync(request.Theme, 1);
-            var basicText = GenerateOpenAIBasicText(request.Theme);
-            //var basicAudio = request.GenerateAudio ? await _aiService.GenerateAudioAsync(basicText, request.Title, 1) : string.Empty;
-            var basicAudio = string.Empty;
+            var basicText = await _aiService.GenerateAiArticleTextAsync(request.Theme, 1);
+            //var basicText = GenerateOpenAIBasicText(request.Theme);
+            var basicAudio = request.GenerateAudio ? await _aiService.GenerateAudioAsync(basicText, request.Title, 1) : string.Empty;
+            //var basicAudio = string.Empty;
 
             var basicWordCount = CountWords(basicText);
 
@@ -53,10 +53,10 @@ namespace LevelByte.Application.Commands.ArticleCommands.CreateArticle
                 basicWordCount
             );
 
-            //var advancedText = await _aiService.GenerateAiArticleTextAsync(request.Theme, 2);
-            var advancedText = GenerateOpenAIBasicText(request.Theme);
-            //var advancedAudio = request.GenerateAudio ? await _aiService.GenerateAudioAsync(advancedText, article.Title, 2) : string.Empty;
-            var advancedAudio = string.Empty;
+            var advancedText = await _aiService.GenerateAiArticleTextAsync(request.Theme, 2);
+            //var advancedText = GenerateOpenAIBasicText(request.Theme);
+            var advancedAudio = request.GenerateAudio ? await _aiService.GenerateAudioAsync(advancedText, article.Title, 2) : string.Empty;
+            //var advancedAudio = string.Empty;
 
             var advancedWordCount = CountWords(advancedText);
 
