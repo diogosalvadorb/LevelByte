@@ -69,8 +69,10 @@ export const deleteArticle = async (id: string): Promise<void> => {
   await api.delete(`/api/Articles/${id}`);
 };
 
-export const fetchArticles = async (): Promise<Article[]> => {
-  const response = await api.get("/api/Articles");
+export const fetchArticles = async (searchTerm?: string): Promise<Article[]> => {
+  const params = searchTerm ? { search: searchTerm } : {};
+  
+  const response = await api.get("/api/Articles", { params });
   return response.data;
 };
 
@@ -91,11 +93,9 @@ export const fetchArticleById = async (id: string): Promise<Article | null> => {
   }
 };
 
-export const getArticleImageUrl = (id: string, hasImage: boolean): string => {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
-  return hasImage ? `${baseUrl}/api/Articles/${id}/Image` : "/placeholder.jpg";
+export const getArticleImageUrl = (imageUrl: string | null): string => {
+  return imageUrl || "/placeholder.jpg";
 };
-
 export const login = async (
   email: string,
   password: string

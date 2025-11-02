@@ -45,12 +45,9 @@ export default function ArticlePage() {
     notFound();
   }
 
-  const imageUrl = getArticleImageUrl(article.id, article.hasImage);
-
   return (
     <ArticleDetail
       article={article}
-      imageUrl={imageUrl}
       onLevelUpdate={loadArticle}
     />
   );

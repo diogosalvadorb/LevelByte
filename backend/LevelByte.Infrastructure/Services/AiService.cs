@@ -4,7 +4,6 @@ using Amazon.S3.Model;
 using LevelByte.Core.Services;
 using LevelByte.Infrastructure.Services.Models;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Identity.Client;
 using System.Text;
 using System.Text.Json;
 
@@ -46,7 +45,6 @@ namespace LevelByte.Application.Services
 
                 var request = new
                 {
-                    //trocar para gpt 5 e comparar qualidade do texto gerado
                     model = "gpt-4o-mini",
                     messages = new[]
                     {
@@ -54,8 +52,6 @@ namespace LevelByte.Application.Services
                         new { role = "user", content = userPrompt }
                     },
                     temperature = 0.7,
-
-                    //testar com valores diferentes de tokens
                     max_tokens = level == 1 ? 500 : 1000
                 };
 
@@ -85,7 +81,7 @@ namespace LevelByte.Application.Services
                 {
                     throw new Exception("No article text generated from OpenAI response");
                 }
-                
+
                 articleText = CleanMarkdown(articleText);
 
                 return articleText;
@@ -157,14 +153,13 @@ namespace LevelByte.Application.Services
             text = System.Text.RegularExpressions.Regex.Replace(text, @"```[\s\S]*?```", string.Empty);
 
             text = System.Text.RegularExpressions.Regex.Replace(text, @"^#{1,6}\s*", string.Empty, System.Text.RegularExpressions.RegexOptions.Multiline);
-
+            
             text = System.Text.RegularExpressions.Regex.Replace(text, @"^\s*>\s*", string.Empty, System.Text.RegularExpressions.RegexOptions.Multiline);
-
+            
             text = System.Text.RegularExpressions.Regex.Replace(text, @"\n{2,}", "\n\n").Trim();
 
             return text;
         }
-
 
         public async Task<string> GenerateAudioAsync(string text, string articleTitle, int level, string voice = "onyx")
         {
@@ -198,7 +193,7 @@ namespace LevelByte.Application.Services
 
                 var fileReplaceName = $"{ReplaceFileName(articleTitle)}_{(level == 1 ? "basic" : "advanced")}_{DateTime.UtcNow:yyyyMMdd_HHmmss}.mp3";
 
-                var publicUrl = await UploadToCloudflareR2Async(audioStream, fileReplaceName);
+                var publicUrl = await UploadToCloudflareR2Async(audioStream, fileReplaceName, "audio/mpeg", "levelbyte");
 
                 Console.WriteLine($"Audio uploaded to R2: {publicUrl}");
                 return publicUrl;
@@ -210,6 +205,27 @@ namespace LevelByte.Application.Services
             }
         }
 
+        public async Task<string> UploadImageAsync(Stream imageStream, string fileName, string contentType, string articleTitle)
+        {
+            try
+            {
+                var sanitizedFileName = ReplaceFileName(articleTitle);
+                var timestamp = DateTime.UtcNow.ToString("dd-MM-yyyy_HH-mm-ss");
+                var extension = Path.GetExtension(fileName).ToLowerInvariant();
+                var fullFileName = $"{sanitizedFileName}_{timestamp}{extension}";
+
+                var publicUrl = await UploadToCloudflareR2Async(imageStream, fullFileName, contentType, "levelbyte-img");
+
+                Console.WriteLine($"Image uploaded to R2: {publicUrl}");
+                return publicUrl;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error while uploading image: {ex.Message}");
+                throw;
+            }
+        }
+
         private static string ReplaceFileName(string name)
         {
             foreach (var c in Path.GetInvalidFileNameChars())
@@ -217,7 +233,7 @@ namespace LevelByte.Application.Services
             return name.Replace(" ", "_").ToLowerInvariant();
         }
 
-        private async Task<string> UploadToCloudflareR2Async(Stream audioStream, string fileReplaceName)
+        private async Task<string> UploadToCloudflareR2Async(Stream fileStream, string fileName, string contentType, string folder)
         {
             var config = new AmazonS3Config
             {
@@ -230,22 +246,22 @@ namespace LevelByte.Application.Services
             using var s3Client = new AmazonS3Client(_accessKey, _secretKey, config);
 
             await using var memoryStream = new MemoryStream();
-            await audioStream.CopyToAsync(memoryStream);
+            await fileStream.CopyToAsync(memoryStream);
             memoryStream.Position = 0;
 
-            var fileName = $"levelbyte/{fileReplaceName}";
+            var fullPath = $"{folder}/{fileName}";
             var uploadRequest = new PutObjectRequest
             {
                 BucketName = _bucket,
-                Key = fileName,
+                Key = fullPath,
                 InputStream = memoryStream,
-                ContentType = "audio/mpeg",
+                ContentType = contentType,
                 DisablePayloadSigning = true
             };
 
             await s3Client.PutObjectAsync(uploadRequest);
 
-            return $"{_publicBaseUrl}/{fileName}";
+            return $"{_publicBaseUrl}/{fullPath}";
         }
     }
 }

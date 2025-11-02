@@ -4,7 +4,6 @@ using LevelByte.Application.Commands.ArticleCommands.UpdateArticle;
 using LevelByte.Application.Commands.ArticleCommands.UpdateArticleLevel;
 using LevelByte.Application.Queries.ArticleQueries.GetAllArticles;
 using LevelByte.Application.Queries.ArticleQueries.GetArticleById;
-using LevelByte.Application.Queries.ArticleQueries.GetArticleImage;
 using LevelByte.Application.ViewModels;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -29,9 +28,13 @@ namespace LevelByte.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<ArticleViewModel>>> GetAll()
+        public async Task<ActionResult<List<ArticleViewModel>>> GetAll([FromQuery] string? search)
         {
-            var query = new GetAllArticlesQuery();
+            var query = new GetAllArticlesQuery
+            {
+                SearchTerm = search
+            };
+
             var result = await _mediator.Send(query);
 
             return Ok(result);
@@ -48,19 +51,7 @@ namespace LevelByte.API.Controllers
 
             return Ok(result);
         }
-
-        [HttpGet("{id}/image")]
-        public async Task<IActionResult> GetImage(Guid id)
-        {
-            var query = new GetArticleImageQuery(id);
-            var result = await _mediator.Send(query);
-
-            if (result == null)
-                return NotFound("Image not found");
-
-            return File(result.ImageData, result.ContentType);
-        }
-
+   
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id, [FromForm] UpdateArticleCommand command)
         {

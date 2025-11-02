@@ -7,14 +7,14 @@ import { FaEdit } from "react-icons/fa";
 import { Article, ArticleLevel } from "@/types/article";
 import EditLevelModal from "../EditLevelModal";
 import AudioPlayer from "../AudioPlayer";
+import { getArticleImageUrl } from "@/lib/api";
 
 interface ArticleDetailProps {
   article: Article;
-  imageUrl: string;
   onLevelUpdate?: () => void;
 }
 
-export function ArticleDetail({ article, imageUrl, onLevelUpdate}: ArticleDetailProps) {
+export function ArticleDetail({ article, onLevelUpdate}: ArticleDetailProps) {
   const { data: session } = useSession();
   const [selectedLevel, setSelectedLevel] = useState(1);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -50,6 +50,7 @@ export function ArticleDetail({ article, imageUrl, onLevelUpdate}: ArticleDetail
   };
 
   const isAdmin = session?.user?.role === "Admin";
+  const imageUrl = getArticleImageUrl(article.imageUrl);
 
   return (
     <>

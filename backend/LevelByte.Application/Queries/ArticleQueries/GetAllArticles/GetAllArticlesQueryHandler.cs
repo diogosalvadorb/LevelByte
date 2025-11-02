@@ -16,11 +16,16 @@ namespace LevelByte.Application.Queries.ArticleQueries.GetAllArticles
         {
             var articles = await _articleRepository.GetAllAsync();
 
+            if (!string.IsNullOrWhiteSpace(request.SearchTerm)) 
+            {  
+                articles = articles.Where(a => a.Title.Contains(request.SearchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
             return articles.Select(article => new ArticleViewModel
             {
                 Id = article.Id,
                 Title = article.Title,
-                HasImage = article.ImageData != null,
+                ImageUrl = article.ImageUrl,
                 CreatedAt = article.CreatedAt,
                 Levels = article.Levels.Select(level => new ArticleLevelViewModel
                 {
