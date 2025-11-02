@@ -23,7 +23,6 @@ namespace LevelByte.Application.Queries.ArticleQueries.GetArticleById
             {
                 Id = article.Id,
                 Title = article.Title,
-                HasImage = article.ImageData != null,
                 CreatedAt = article.CreatedAt,
                 Levels = article.Levels.Select(l => new ArticleLevelViewModel
                 {

@@ -1,6 +1,7 @@
 ﻿using LevelByte.Application.Validators;
 using LevelByte.Application.ViewModels;
 using LevelByte.Core.Repository;
+using LevelByte.Core.Services;
 using MediatR;
 
 namespace LevelByte.Application.Commands.ArticleCommands.UpdateArticle
@@ -8,10 +9,12 @@ namespace LevelByte.Application.Commands.ArticleCommands.UpdateArticle
     public class UpdateArticleCommandHandler : IRequestHandler<UpdateArticleCommand, ArticleViewModel?>
     {
         private readonly IArticleRepository _repository;
+        private readonly IAiService _aiService;
 
-        public UpdateArticleCommandHandler(IArticleRepository repository)
+        public UpdateArticleCommandHandler(IArticleRepository repository, IAiService aiService)
         {
             _repository = repository;
+            _aiService = aiService;
         }
 
         public async Task<ArticleViewModel?> Handle(UpdateArticleCommand request, CancellationToken cancellationToken)
@@ -20,15 +23,12 @@ namespace LevelByte.Application.Commands.ArticleCommands.UpdateArticle
             if (article == null)
                 return null;
 
-            byte[]? imageData = article.ImageData;
-            string? imageContentType = article.ImageContentType;
+            string? imageUrl = article.ImageUrl;
 
             if (request.RemoveImage)
             {
-                imageData = null;
-                imageContentType = null;
+                imageUrl = null;
             }
-
             else if (request.Image != null)
             {
                 var validation = ImageValidator.ValidateImage(request.Image);
@@ -36,12 +36,13 @@ namespace LevelByte.Application.Commands.ArticleCommands.UpdateArticle
                     throw new InvalidOperationException(validation.ErrorMessage);
 
                 var imageResult = await ImageValidator.ProcessImage(request.Image);
-                imageData = imageResult.Data;
-                imageContentType = imageResult.ContentType;
+
+                using var imageStream = new MemoryStream(imageResult.Data);
+                imageUrl = await _aiService.UploadImageAsync(imageStream, request.Image.FileName, imageResult.ContentType);
             }
 
             article.UpdateTitle(request.Title);
-            article.UpdateImage(imageData, imageContentType);
+            article.UpdateImage(imageUrl);
 
             await _repository.UpdateArticleAsync(article);
 
@@ -49,7 +50,7 @@ namespace LevelByte.Application.Commands.ArticleCommands.UpdateArticle
             {
                 Id = article.Id,
                 Title = article.Title,
-                HasImage = article.ImageData != null,
+                ImageUrl = article.ImageUrl,
                 CreatedAt = article.CreatedAt,
                 Levels = article.Levels.Select(l => new ArticleLevelViewModel
                 {

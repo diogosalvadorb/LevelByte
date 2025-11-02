@@ -3,6 +3,7 @@ using System;
 using LevelByte.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LevelByte.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(LevelByteDbContext))]
-    partial class LevelByteDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251102144346_UpdateArticleImageToUrl")]
+    partial class UpdateArticleImageToUrl
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
