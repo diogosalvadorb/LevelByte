@@ -33,7 +33,7 @@ namespace LevelByte.Application.Commands.ArticleCommands.CreateArticle
                 var imageResult = await ImageValidator.ProcessImage(request.Image);
 
                 using var imageStream = new MemoryStream(imageResult.Data);
-                imageUrl = await _aiService.UploadImageAsync(imageStream, request.Image.FileName, imageResult.ContentType);
+                imageUrl = await _aiService.UploadImageAsync(imageStream, request.Image.FileName, imageResult.ContentType, request.Title);
             }
 
             var article = new Article(request.Title, imageUrl);

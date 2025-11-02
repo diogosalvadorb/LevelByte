@@ -38,7 +38,7 @@ namespace LevelByte.Application.Commands.ArticleCommands.UpdateArticle
                 var imageResult = await ImageValidator.ProcessImage(request.Image);
 
                 using var imageStream = new MemoryStream(imageResult.Data);
-                imageUrl = await _aiService.UploadImageAsync(imageStream, request.Image.FileName, imageResult.ContentType);
+                imageUrl = await _aiService.UploadImageAsync(imageStream, request.Image.FileName, imageResult.ContentType, request.Title);
             }
 
             article.UpdateTitle(request.Title);

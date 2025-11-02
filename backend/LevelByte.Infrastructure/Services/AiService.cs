@@ -205,12 +205,12 @@ namespace LevelByte.Application.Services
             }
         }
 
-        public async Task<string> UploadImageAsync(Stream imageStream, string fileName, string contentType)
+        public async Task<string> UploadImageAsync(Stream imageStream, string fileName, string contentType, string articleTitle)
         {
             try
             {
-                var sanitizedFileName = ReplaceFileName(fileName);
-                var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
+                var sanitizedFileName = ReplaceFileName(articleTitle);
+                var timestamp = DateTime.UtcNow.ToString("dd-MM-yyyy_HH-mm-ss");
                 var extension = Path.GetExtension(fileName).ToLowerInvariant();
                 var fullFileName = $"{sanitizedFileName}_{timestamp}{extension}";
 
