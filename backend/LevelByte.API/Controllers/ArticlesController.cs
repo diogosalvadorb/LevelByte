@@ -29,9 +29,13 @@ namespace LevelByte.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<ArticleViewModel>>> GetAll()
+        public async Task<ActionResult<List<ArticleViewModel>>> GetAll([FromQuery] string? search)
         {
-            var query = new GetAllArticlesQuery();
+            var query = new GetAllArticlesQuery
+            {
+                SearchTerm = search
+            };
+
             var result = await _mediator.Send(query);
 
             return Ok(result);

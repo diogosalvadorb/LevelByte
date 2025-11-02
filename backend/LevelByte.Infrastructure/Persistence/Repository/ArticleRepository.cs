@@ -15,6 +15,7 @@ namespace LevelByte.Infrastructure.Persistence.Repository
         public async Task<List<Article>> GetAllAsync()
         {
             return await _context.Articles
+                .AsNoTracking()
                 .Include(a => a.Levels)
                 .OrderByDescending(a => a.CreatedAt)
                 .ToListAsync();

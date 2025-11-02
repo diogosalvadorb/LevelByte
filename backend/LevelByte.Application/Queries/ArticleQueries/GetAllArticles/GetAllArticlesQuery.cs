@@ -5,5 +5,6 @@ namespace LevelByte.Application.Queries.ArticleQueries.GetAllArticles
 {
     public class GetAllArticlesQuery : IRequest<List<ArticleViewModel>>
     {
+        public string? SearchTerm { get; set; }
     }
 }

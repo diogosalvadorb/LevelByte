@@ -69,8 +69,10 @@ export const deleteArticle = async (id: string): Promise<void> => {
   await api.delete(`/api/Articles/${id}`);
 };
 
-export const fetchArticles = async (): Promise<Article[]> => {
-  const response = await api.get("/api/Articles");
+export const fetchArticles = async (searchTerm?: string): Promise<Article[]> => {
+  const params = searchTerm ? { search: searchTerm } : {};
+  
+  const response = await api.get("/api/Articles", { params });
   return response.data;
 };
 

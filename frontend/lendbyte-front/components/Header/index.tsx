@@ -3,18 +3,33 @@
 import Link from "next/link";
 import { FaSearch, FaUser } from "react-icons/fa";
 import { useSession, signOut } from "next-auth/react";
+import { useState, FormEvent } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export function Header() {
   const { data: session } = useSession();
   const user = session?.user;
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [searchTerm, setSearchTerm] = useState(searchParams.get("search") || "");
 
-  return(
+  const handleSearch = (e: FormEvent) => {
+    e.preventDefault();
+    
+    if (searchTerm.trim()) {
+      router.push(`/?search=${encodeURIComponent(searchTerm.trim())}`);
+    } else {
+      router.push("/");
+    }
+  };
+
+  return (
     <header className="bg-gray-950 border-b">
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-white cursor-pointer">
+          <Link href="/" className="text-2xl font-bold text-white cursor-pointer hover:text-blue-400 transition">
             LevelByte
-          </h1>
+          </Link>
           <nav className="flex items-center gap-3">
             <Link
               href="/"
@@ -44,16 +59,21 @@ export function Header() {
               </Link>
             )}
 
-            <div className="flex items-center gap-2">
+            <form onSubmit={handleSearch} className="flex items-center gap-2">
               <input
                 type="text"
-                placeholder="Search"
-                className="bg-gray-800 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Search articles..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="bg-gray-800 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-48"
               />
-              <button className="bg-blue-600 p-2 rounded-lg hover:bg-blue-700 transition cursor-pointer">
+              <button 
+                type="submit"
+                className="bg-blue-600 p-2 rounded-lg hover:bg-blue-700 transition cursor-pointer"
+              >
                 <FaSearch size={20} className="text-white" />
               </button>
-            </div>
+            </form>
 
             {user && (
               <div className="flex items-center gap-3 ml-4">
