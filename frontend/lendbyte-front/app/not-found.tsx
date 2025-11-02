@@ -1,7 +1,10 @@
-import Image from "next/image";
-import Link from "next/link";
+'use client';
 
-export default function NotFound() {
+import { Suspense } from "react";
+import Image from "next/image";
+import Link from 'next/link';
+
+function NotFoundContent() {
   return (
     <main className="bg-gray-900 flex items-start justify-center min-h-screen pt-8">
       <div className="relative w-full max-w-[120vh] h-[80vh] mt-4 flex items-center justify-center text-center rounded-lg overflow-hidden">
@@ -33,5 +36,13 @@ export default function NotFound() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function NotFound() {
+  return (
+    <Suspense fallback={<div className="text-center mt-10 text-gray-400">Loading...</div>}>
+      <NotFoundContent />
+    </Suspense>
   );
 }
