@@ -141,5 +141,5 @@ Acesse a aplicação em
 - 🗄️ **Banco de Dados (PostgreSQL)** — hospedado na <a href="https://neon.tech/" target="_blank">**Neon**</a>  
 - 🔊 **OpenAI** — <a href="https://platform.openai.com/docs/api-reference/introduction/" target="_blank">Geração de texto e áudio com IA</a>  
 - ☁️ **Cloudflare R2** — <a href="https://developers.cloudflare.com/r2/" target="_blank">Armazenamento de áudios e imagens</a>
-- 🔁 **CI/CD Automático** — configurado com <a href="https://github.com/features/actions" target="_blank">**GitHub Actions**</a> 
+- 🔁 **CI/CD Automático** — configurado com <a href="https://github.com/features/actions" target="_blank" rel="noopener noreferrer">**GitHub Actions**</a> 
 
