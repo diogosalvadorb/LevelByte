@@ -7,7 +7,7 @@ Ideal para quem quer aprender inglês técnico de forma prática. Aprenda tecnol
 
 ### ☁️ Publicação da Infraestrutura
 
-- 🚀 **Back-End (.NET 9 API)** — publicado na [**Fly.io**](https://fly.io/)  
+- 🚀 **Back-End (.NET 8 API)** — publicado na [**Fly.io**](https://fly.io/)  
 - 💻 **Front-End (Next.js 16)** — publicado na [**Vercel**](https://vercel.com/)  
 - 🗄️ **Banco de Dados (PostgreSQL)** — hospedado na [**Neon**](https://neon.tech/)
 - ⚙️ **CI/CD Automático** — implementado com [**GitHub Actions**](https://github.com/features/actions) para integração e deploy contínuo
@@ -135,7 +135,7 @@ Acesse a aplicação em
 
 ### 🌍 Infraestrutura e Serviços
 
-- 🚀 **[Fly.io](https://fly.io/)** — Hospedagem do **Back-End (.NET 9 API)**  
+- 🚀 **[Fly.io](https://fly.io/)** — Hospedagem do **Back-End (.NET 8 API)**  
 - 💻 **[Vercel](https://vercel.com/)** — Hospedagem do **Front-End (Next.js 16)**  
 - 🗄️ **[Neon PostgreSQL](https://neon.tech/)** — Banco de dados PostgreSQL hospedado em nuvem  
 - 🔊 **[OpenAI](https://platform.openai.com/docs/api-reference/introduction/)** — Geração de texto e áudio com IA  
