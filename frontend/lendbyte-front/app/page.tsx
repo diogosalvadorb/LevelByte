@@ -5,6 +5,7 @@ import { ArticleCard } from "@/components/ArticleCard";
 import { ArticleCardData } from "@/types/article";
 import { fetchArticles, getArticleImageUrl } from "@/lib/api";
 import Link from "next/link";
+import { FaSearch } from "react-icons/fa";
 
 function HomeContent() {
   const router = useRouter();
@@ -58,11 +59,34 @@ function HomeContent() {
   };
 
   return (
-    <main className="bg-gray-900 text-white min-h-screen flex flex-col items-center py-10 px-4">
-      <div className="w-full max-w-6xl">
-        <h1 className="text-3xl font-bold mb-8 text-center md:text-left">
+    <main className="bg-gray-900 text-white min-h-screen py-6 md:py-10 px-4">
+      <div className="w-full max-w-6xl mx-auto">
+        <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-8 text-center md:text-left">
           {termFromUrl ? `Results for "${termFromUrl}"` : "Latest Articles"}
         </h1>
+
+        {/* Mobile */}
+        <div className="block md:hidden mb-6">
+          <form
+            onSubmit={handleSearch}
+            className="flex flex-row items-center gap-2 w-full"
+          >
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="flex-1 bg-gray-800 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+
+            <button
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition cursor-pointer flex items-center justify-center"
+            >
+              <FaSearch size={16} />
+            </button>
+          </form>
+        </div>
 
         {loading && (
           <p className="text-center text-gray-400">Loading articles...</p>
@@ -90,14 +114,13 @@ function HomeContent() {
         {!loading && !error && articles.length > 0 && (
           <div className="flex flex-col gap-6">
             <div className="flex flex-col md:flex-row md:items-start md:gap-8">
-
-              <div className="flex-1">
+              <div className="flex-1 w-full">
                 <ArticleCard {...articles[0]} />
               </div>
-
+            
               <form
                 onSubmit={handleSearch}
-                className="flex gap-2 mt-4 md:mt-2 md:w-94 md:self-start"
+                className="hidden md:flex flex-row w-full md:w-96 gap-2 md:justify-end"
               >
                 <input
                   type="text"
@@ -108,7 +131,7 @@ function HomeContent() {
                 />
                 <button
                   type="submit"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition cursor-pointer"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition cursor-pointer whitespace-nowrap"
                 >
                   Search
                 </button>
@@ -128,15 +151,15 @@ function HomeContent() {
 export default function Home() {
   return (
     <Suspense fallback={
-      <main className="bg-gray-900 text-white min-h-screen flex flex-col items-center py-10 px-4">
-        <div className="w-full max-w-6xl">
-          <h1 className="text-3xl font-bold mb-8 text-center md:text-left">
-            Latest Articles
-          </h1>
-          <p className="text-center text-gray-400">Loading articles...</p>
-        </div>
-      </main>
-    }>
+        <main className="bg-gray-900 text-white min-h-screen flex flex-col items-center py-10 px-4">
+          <div className="w-full max-w-6xl">
+            <h1 className="text-3xl font-bold mb-8 text-center md:text-left">
+              Latest Articles
+            </h1>
+            <p className="text-center text-gray-400">Loading articles...</p>
+          </div>
+        </main>
+      }>
       <HomeContent />
     </Suspense>
   );

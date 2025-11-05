@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 import { Article } from "@/types/article";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import CreateArticleModal from "@/components/CreateArticleModal";
-import { fetchArticles, deleteArticle } from "@/lib/api";
 import UpdateArticleModal from "@/components/UpdateArticleModal";
 import DeleteConfirmationModal from "@/components/DeleteArticleModal";
+import { fetchArticles, deleteArticle } from "@/lib/api";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -101,9 +101,9 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 py-8 px-4 text-white">
+    <div className="min-h-screen bg-gray-900 text-white pt-24 md:pt-28 pb-12 px-4">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
           <h1 className="text-3xl font-bold">Dashboard</h1>
           <button
             onClick={() => setIsCreateModalOpen(true)}
@@ -123,62 +123,100 @@ export default function Dashboard() {
             No articles found. Create your first article!
           </div>
         ) : (
-          <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-            <table className="w-full table-fixed">
-              <thead className="bg-gray-700">
-                <tr>
-                  <th className="w-1/5 px-4 py-3 text-left text-sm font-semibold text-gray-200">
-                    Title
-                  </th>
-                  <th className="w-1/6 px-4 py-3 text-left text-sm font-semibold text-gray-200">
-                    Date
-                  </th>
-                  <th className="w-1/2 px-4 py-3 text-left text-sm font-semibold text-gray-200">
-                    Preview
-                  </th>
-                  <th className="w-[100px] px-2 py-3 text-center text-sm font-semibold text-gray-200">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-700">
-                {articles.map((article) => (
-                  <tr
-                    key={article.id}
-                    className="hover:bg-gray-750 transition-colors"
-                  >
-                    <td className="px-4 py-3 font-medium truncate">
-                      {article.title}
-                    </td>
-                    <td className="px-4 py-3 text-gray-400 text-sm whitespace-nowrap">
-                      {formatDate(article.createdAt)}
-                    </td>
-                    <td className="px-4 py-3 text-gray-400 text-sm line-clamp-2 truncate">
-                      {getPreviewText(article)}
-                    </td>
-                    <td className="px-2 py-3">
-                      <div className="flex justify-center gap-2">
-                        <button
-                          onClick={() => handleEdit(article)}
-                          className="text-blue-400 hover:text-blue-300 transition-colors p-2 cursor-pointer"
-                          title="Edit"
-                        >
-                          <FaEdit size={20} />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteClick(article)}
-                          className="text-red-400 hover:text-red-300 transition-colors p-2 cursor-pointer"
-                          title="Delete"
-                        >
-                          <FaTrash size={20} />
-                        </button>
-                      </div>
-                    </td>
+          <>
+            <div className="hidden md:block bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+              <table className="w-full table-fixed">
+                <thead className="bg-gray-700">
+                  <tr>
+                    <th className="w-1/5 px-4 py-3 text-left text-sm font-semibold text-gray-200">
+                      Title
+                    </th>
+                    <th className="w-1/6 px-4 py-3 text-left text-sm font-semibold text-gray-200">
+                      Date
+                    </th>
+                    <th className="w-1/2 px-4 py-3 text-left text-sm font-semibold text-gray-200">
+                      Preview
+                    </th>
+                    <th className="w-[100px] px-2 py-3 text-center text-sm font-semibold text-gray-200">
+                      Actions
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-gray-700">
+                  {articles.map((article) => (
+                    <tr
+                      key={article.id}
+                      className="hover:bg-gray-750 transition-colors"
+                    >
+                      <td className="px-4 py-3 font-medium truncate">
+                        {article.title}
+                      </td>
+                      <td className="px-4 py-3 text-gray-400 text-sm whitespace-nowrap">
+                        {formatDate(article.createdAt)}
+                      </td>
+                      <td className="px-4 py-3 text-gray-400 text-sm line-clamp-2 truncate">
+                        {getPreviewText(article)}
+                      </td>
+                      <td className="px-2 py-3">
+                        <div className="flex justify-center gap-2">
+                          <button
+                            onClick={() => handleEdit(article)}
+                            className="text-blue-400 hover:text-blue-300 transition-colors p-2 cursor-pointer"
+                            title="Edit"
+                          >
+                            <FaEdit size={20} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClick(article)}
+                            className="text-red-400 hover:text-red-300 transition-colors p-2 cursor-pointer"
+                            title="Delete"
+                          >
+                            <FaTrash size={20} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+                  {/* Mobile */}
+            <div className="grid grid-cols-1 gap-4 md:hidden">
+              {articles.map((article) => (
+                <div
+                  key={article.id}
+                  className="bg-gray-800 rounded-lg p-4 shadow-md flex flex-col gap-3"
+                >
+                  <div className="flex justify-between items-start">
+                    <h2 className="font-semibold text-lg truncate">
+                      {article.title}
+                    </h2>
+                    <span className="text-sm text-gray-400">
+                      {formatDate(article.createdAt)}
+                    </span>
+                  </div>
+                  <p className="text-gray-400 text-sm">{getPreviewText(article)}</p>
+                  <div className="flex justify-end gap-3">
+                    <button
+                      onClick={() => handleEdit(article)}
+                      className="text-blue-400 hover:text-blue-300 transition-colors p-2 cursor-pointer"
+                      title="Edit"
+                    >
+                      <FaEdit size={18} />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteClick(article)}
+                      className="text-red-400 hover:text-red-300 transition-colors p-2 cursor-pointer"
+                      title="Delete"
+                    >
+                      <FaTrash size={18} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
 
