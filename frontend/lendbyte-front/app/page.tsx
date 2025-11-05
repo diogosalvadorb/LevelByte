@@ -112,15 +112,34 @@ function HomeContent() {
         )}
 
         {!loading && !error && articles.length > 0 && (
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-col md:flex-row md:items-start md:gap-8">
+          <div className="flex flex-col gap-6 items-center xl:items-start">
+            <form
+              onSubmit={handleSearch}
+              className="hidden md:flex xl:hidden flex-row w-full sm:max-w-[675px] gap-2"
+            >
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="flex-1 bg-gray-800 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                type="submit"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition cursor-pointer whitespace-nowrap"
+              >
+                Search
+              </button>
+            </form>
+
+            <div className="hidden xl:flex flex-row items-start gap-8 w-full">
               <div className="flex-1 w-full">
                 <ArticleCard {...articles[0]} />
               </div>
             
               <form
                 onSubmit={handleSearch}
-                className="hidden md:flex flex-row w-full md:w-96 gap-2 md:justify-end"
+                className="flex flex-row w-96 gap-2"
               >
                 <input
                   type="text"
@@ -136,6 +155,10 @@ function HomeContent() {
                   Search
                 </button>
               </form>
+            </div>
+
+            <div className="block xl:hidden">
+              <ArticleCard {...articles[0]} />
             </div>
 
             {articles.slice(1).map((article) => (

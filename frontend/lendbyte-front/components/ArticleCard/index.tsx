@@ -11,8 +11,8 @@ interface ArticleCardProps {
 
 export function ArticleCard({ id, title, date, content, image }: ArticleCardProps) {
   return (
-    <div className="bg-white text-gray-900 rounded-md shadow-md p-4 flex w-[675px] gap-4 hover:scale-[1.02] transition-transform">
-      <div className="shrink-0 w-52 h-32 relative rounded-md">
+    <div className="bg-white text-gray-900 rounded-md shadow-md p-4 flex flex-col sm:flex-row w-full sm:max-w-[675px] gap-4 hover:scale-[1.02] transition-transform">
+      <div className="shrink-0 w-full sm:w-52 h-48 sm:h-32 relative rounded-md">
         <Image
           src={image}
           alt={title}
