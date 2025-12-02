@@ -3,7 +3,7 @@ Projeto simplifica artigos e notícias de tecnologia, do português ou inglês, 
 Ideal para quem quer aprender inglês técnico de forma prática. Aprenda tecnologia e inglês ao mesmo tempo.
 
 🌐 **Acesse o projeto online:**  
-👉 <a href="https://level-byte.vercel.app/" target="_blank">https://level-byte.vercel.app/</a>
+👉 <a href="https://www.levelbyte.blog" target="_blank">https://www.levelbyte.blog</a>
 
 ### ☁️ Publicação da Infraestrutura
 
