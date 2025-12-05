@@ -6,24 +6,37 @@ import { ArticleCardData } from "@/types/article";
 import { fetchArticles, getArticleImageUrl } from "@/lib/api";
 import Link from "next/link";
 import { FaSearch } from "react-icons/fa";
+import { Pagination } from "@/components/Pagination";
 
 function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const termFromUrl = searchParams.get("search") || "";
+  const pageFromUrl = parseInt(searchParams.get("page") || "1");
 
   const [searchTerm, setSearchTerm] = useState(termFromUrl);
+  const [currentPage, setCurrentPage] = useState(pageFromUrl);
   const [articles, setArticles] = useState<ArticleCardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [hasPreviousPage, setHasPreviousPage] = useState(false);
+  const [hasNextPage, setHasNextPage] = useState(false);
+
+  const pageSize = 8;
 
   useEffect(() => {
     async function loadArticles() {
       try {
         setLoading(true);
-        const data = await fetchArticles(termFromUrl || undefined);
+        const data = await fetchArticles(
+          termFromUrl || undefined,
+          pageFromUrl,
+          pageSize
+        );
 
-        const levelOneArticles: ArticleCardData[] = data
+        const levelOneArticles: ArticleCardData[] = data.items
           .map((article) => {
             const levelOne = article.levels.find((lvl) => lvl.level === 1);
             if (!levelOne) return null;
@@ -41,6 +54,11 @@ function HomeContent() {
           .filter((a): a is ArticleCardData => Boolean(a));
 
         setArticles(levelOneArticles);
+        setTotalPages(data.totalPages);
+        setTotalCount(data.totalCount);
+        setHasPreviousPage(data.hasPreviousPage);
+        setHasNextPage(data.hasNextPage);
+        setCurrentPage(data.pageNumber);
       } catch (err) {
         setError("Failed to load articles. Please try again later.");
         console.error("Error fetching articles:", err);
@@ -50,20 +68,42 @@ function HomeContent() {
     }
 
     loadArticles();
-  }, [termFromUrl]);
+  }, [termFromUrl, pageFromUrl]);
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
     const trimmed = searchTerm.trim();
-    router.push(trimmed ? `/?search=${encodeURIComponent(trimmed)}` : "/");
+
+    const params = new URLSearchParams();
+    if (trimmed) params.set("search", trimmed);
+    params.set("page", "1");
+
+    router.push(`/?${params.toString()}`);
+  };
+
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams();
+    if (termFromUrl) params.set("search", termFromUrl);
+    params.set("page", page.toString());
+
+    router.push(`/?${params.toString()}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
     <main className="bg-gray-900 text-white min-h-screen py-6 md:py-10 px-4">
       <div className="w-full max-w-6xl mx-auto">
-        <h1 className="text-2xl md:text-3xl font-bold mb-4 md:mb-8 text-center md:text-left">
-          {termFromUrl ? `Results for "${termFromUrl}"` : "Latest Articles"}
-        </h1>
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold text-center md:text-left">
+            {termFromUrl ? `Results for "${termFromUrl}"` : "Latest Articles"}
+          </h1>
+
+          {totalCount > 0 && (
+            <p className="text-sm text-gray-400">
+              {totalCount} article{totalCount !== 1 ? "s" : ""} found
+            </p>
+          )}
+        </div>
 
         {/* Mobile */}
         <div className="block md:hidden mb-6">
@@ -78,7 +118,6 @@ function HomeContent() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="flex-1 bg-gray-800 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-
             <button
               type="submit"
               className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition cursor-pointer flex items-center justify-center"
@@ -112,34 +151,11 @@ function HomeContent() {
         )}
 
         {!loading && !error && articles.length > 0 && (
-          <div className="flex flex-col gap-6 items-center xl:items-start">
-            <form
-              onSubmit={handleSearch}
-              className="hidden md:flex xl:hidden flex-row w-full sm:max-w-[675px] gap-2"
-            >
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="flex-1 bg-gray-800 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <button
-                type="submit"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition cursor-pointer whitespace-nowrap"
-              >
-                Search
-              </button>
-            </form>
-
-            <div className="hidden xl:flex flex-row items-start gap-8 w-full">
-              <div className="flex-1 w-full">
-                <ArticleCard {...articles[0]} />
-              </div>
-            
+          <>
+            <div className="flex flex-col gap-6 items-center xl:items-start">
               <form
                 onSubmit={handleSearch}
-                className="flex flex-row w-96 gap-2"
+                className="hidden md:flex xl:hidden flex-row w-full sm:max-w-[675px] gap-2"
               >
                 <input
                   type="text"
@@ -155,16 +171,51 @@ function HomeContent() {
                   Search
                 </button>
               </form>
-            </div>
 
-            <div className="block xl:hidden">
-              <ArticleCard {...articles[0]} />
-            </div>
+              <div className="hidden xl:flex flex-row items-start gap-8 w-full">
+                <div className="flex-1 w-full">
+                  <ArticleCard {...articles[0]} />
+                </div>
 
-            {articles.slice(1).map((article) => (
-              <ArticleCard key={article.id} {...article} />
-            ))}
-          </div>
+                <form
+                  onSubmit={handleSearch}
+                  className="flex flex-row w-96 gap-2"
+                >
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="flex-1 bg-gray-800 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <button
+                    type="submit"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition cursor-pointer whitespace-nowrap"
+                  >
+                    Search
+                  </button>
+                </form>
+              </div>
+
+              <div className="block xl:hidden">
+                <ArticleCard {...articles[0]} />
+              </div>
+
+              {articles.slice(1).map((article) => (
+                <ArticleCard key={article.id} {...article} />
+              ))}
+
+              <div className="w-full flex justify-center xl:justify-start mt-2 pl-50">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                  hasPreviousPage={hasPreviousPage}
+                  hasNextPage={hasNextPage}
+                />
+              </div>
+            </div>
+          </>
         )}
       </div>
     </main>

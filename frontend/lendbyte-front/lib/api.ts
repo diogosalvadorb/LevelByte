@@ -2,6 +2,7 @@ import axios from "axios";
 import { getSession } from "next-auth/react";
 import { Article } from "@/types/article";
 import { LoginResponse } from "@/types/login.type";
+import { PaginatedResponse } from "@/types/pagination";
 
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050",
@@ -69,8 +70,15 @@ export const deleteArticle = async (id: string): Promise<void> => {
   await api.delete(`/api/Articles/${id}`);
 };
 
-export const fetchArticles = async (searchTerm?: string): Promise<Article[]> => {
-  const params = searchTerm ? { search: searchTerm } : {};
+export const fetchArticles = async (searchTerm?: string, pageNumber: number = 1,  pageSize: number = 4): Promise<PaginatedResponse<Article>> => {
+  const params: Record<string, string | number> = {
+    pageNumber,
+    pageSize,
+  };
+  
+  if (searchTerm) {
+    params.search = searchTerm;
+  }
   
   const response = await api.get("/api/Articles", { params });
   return response.data;
@@ -96,6 +104,7 @@ export const fetchArticleById = async (id: string): Promise<Article | null> => {
 export const getArticleImageUrl = (imageUrl: string | null): string => {
   return imageUrl || "/placeholder.jpg";
 };
+
 export const login = async (
   email: string,
   password: string

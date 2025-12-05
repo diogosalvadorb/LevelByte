@@ -52,7 +52,7 @@ namespace LevelByte.Application.Services
                         new { role = "user", content = userPrompt }
                     },
                     temperature = 0.7,
-                    max_tokens = level == 1 ? 500 : 1000
+                    max_tokens = level == 1 ? 350 : 500
                 };
 
                 var json = JsonSerializer.Serialize(request, _jsonOptions);
@@ -102,7 +102,7 @@ namespace LevelByte.Application.Services
                     If the user provides a full article, summarize and simplify it.
                     If the user provides only a topic, create an article from scratch.
                     Guidelines for BASIC level:
-                    - Length: between 900 and 1200 characters
+                    - Length: between 600 and 800 characters
                     - Use simple vocabulary and short sentences
                     - Avoid jargon or complex words
                     - Explain the topic clearly, with simple examples
@@ -113,7 +113,7 @@ namespace LevelByte.Application.Services
                        If the user provides a full article, summarize and adapt it in a technical and fluent style.
                        If the user provides only a topic, create an article from scratch with depth and precision.
                        Guidelines for ADVANCED level:
-                       - Length: between 1600 and 1900 characters
+                       - Length: between 800 and 1200 characters
                        - Use advanced vocabulary and technical accuracy
                        - Explain context, importance, and applications
                        - Keep text cohesive, professional, and detailed.",
@@ -128,13 +128,13 @@ namespace LevelByte.Application.Services
             {
                 1 => $@"Input: {input}
                     If this input is a full article, rewrite and summarize it for English learners at a BASIC level (A2–B1),
-                    keeping 900–1200 characters. 
+                    keeping 600–800 characters. 
                     If it’s only a topic (like 'Data Structures' or 'APIs'), create a simple educational text about it from scratch.
                     Focus on clarity, simplicity, and comprehension.",
 
                 2 => $@"Input: {input}
                     If this input is a full article, summarize and rewrite it for advanced English learners (B2–C1) with technical detail,
-                    keeping 1600–1900 characters. 
+                    keeping 800–1200 characters. 
                     If it’s only a topic, create a deep, structured article from scratch, exploring the principles, context,
                     and real-world applications of {input}.",
 
@@ -153,9 +153,9 @@ namespace LevelByte.Application.Services
             text = System.Text.RegularExpressions.Regex.Replace(text, @"```[\s\S]*?```", string.Empty);
 
             text = System.Text.RegularExpressions.Regex.Replace(text, @"^#{1,6}\s*", string.Empty, System.Text.RegularExpressions.RegexOptions.Multiline);
-            
+
             text = System.Text.RegularExpressions.Regex.Replace(text, @"^\s*>\s*", string.Empty, System.Text.RegularExpressions.RegexOptions.Multiline);
-            
+
             text = System.Text.RegularExpressions.Regex.Replace(text, @"\n{2,}", "\n\n").Trim();
 
             return text;

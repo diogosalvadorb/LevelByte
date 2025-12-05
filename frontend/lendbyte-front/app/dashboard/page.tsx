@@ -8,18 +8,32 @@ import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import CreateArticleModal from "@/components/CreateArticleModal";
 import UpdateArticleModal from "@/components/UpdateArticleModal";
 import DeleteConfirmationModal from "@/components/DeleteArticleModal";
+import { Pagination } from "@/components/Pagination";
 import { fetchArticles, deleteArticle } from "@/lib/api";
+
+type PaginatedArticles = {
+  items: Article[];
+  totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+  pageNumber: number;
+};
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [articles, setArticles] = useState<Article[]>([]);
+  const [paginatedData, setPaginatedData] = useState<PaginatedArticles | null>(
+    null
+  );
+  const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const pageSize = 8;
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -30,21 +44,22 @@ export default function Dashboard() {
   }, [status, session, router]);
 
   useEffect(() => {
-    if (session?.user.role === "Admin") {
-      loadArticles();
+    if (session?.user?.role === "Admin") {
+      loadArticles(currentPage);
     }
-  }, [session]);
+  }, [session, currentPage]);
 
-  const loadArticles = async () => {
+  const loadArticles = async (page: number) => {
     try {
       setLoading(true);
-      const data = await fetchArticles();
-      setArticles(data);
+      const data = await fetchArticles(undefined, page, pageSize);
+      setPaginatedData(data);
     } catch (error) {
       console.error("Error loading articles:", error);
     } finally {
       setLoading(false);
     }
+    return;
   };
 
   const handleEdit = (article: Article) => {
@@ -67,13 +82,18 @@ export default function Dashboard() {
       setIsDeleteModalOpen(false);
       setSelectedArticle(null);
 
-      loadArticles();
+      loadArticles(currentPage);
     } catch (error) {
       console.error("Error deleting article:", error);
       alert("Failed to delete article. Please try again.");
     } finally {
       setIsDeleting(false);
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   if (status === "loading") {
@@ -118,7 +138,7 @@ export default function Dashboard() {
           <div className="text-center text-gray-400 py-12">
             Loading articles...
           </div>
-        ) : articles.length === 0 ? (
+        ) : !paginatedData || paginatedData.items.length === 0 ? (
           <div className="text-center text-gray-400 py-12">
             No articles found. Create your first article!
           </div>
@@ -143,7 +163,7 @@ export default function Dashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-700">
-                  {articles.map((article) => (
+                  {paginatedData.items.map((article) => (
                     <tr
                       key={article.id}
                       className="hover:bg-gray-750 transition-colors"
@@ -181,9 +201,9 @@ export default function Dashboard() {
               </table>
             </div>
 
-                  {/* Mobile */}
+            {/* Mobile */}
             <div className="grid grid-cols-1 gap-4 md:hidden">
-              {articles.map((article) => (
+              {paginatedData.items.map((article) => (
                 <div
                   key={article.id}
                   className="bg-gray-800 rounded-lg p-4 shadow-md flex flex-col gap-3"
@@ -216,6 +236,18 @@ export default function Dashboard() {
                 </div>
               ))}
             </div>
+
+            {paginatedData.totalPages > 1 && (
+              <div className="w-full flex justify-center mt-8">
+                <Pagination
+                  currentPage={paginatedData.pageNumber}
+                  totalPages={paginatedData.totalPages}
+                  onPageChange={handlePageChange}
+                  hasPreviousPage={paginatedData.hasPreviousPage}
+                  hasNextPage={paginatedData.hasNextPage}
+                />
+              </div>
+            )}
           </>
         )}
       </div>
@@ -223,7 +255,7 @@ export default function Dashboard() {
       <CreateArticleModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        onSuccess={loadArticles}
+        onSuccess={() => loadArticles(currentPage)}
       />
 
       {selectedArticle && (
@@ -234,7 +266,7 @@ export default function Dashboard() {
               setIsUpdateModalOpen(false);
               setSelectedArticle(null);
             }}
-            onSuccess={loadArticles}
+            onSuccess={() => loadArticles(currentPage)}
             article={selectedArticle}
           />
 

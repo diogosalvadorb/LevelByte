@@ -22,11 +22,16 @@ namespace LevelByte.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<ArticleViewModel>>> GetAll([FromQuery] string? search)
+        public async Task<ActionResult<PaginatedResult<ArticleViewModel>>> GetAll(
+            [FromQuery] string? search,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 8)
         {
             var query = new GetAllArticlesQuery
             {
-                SearchTerm = search
+                SearchTerm = search,
+                PageNumber = pageNumber,
+                PageSize = pageSize
             };
 
             var result = await _mediator.Send(query);
