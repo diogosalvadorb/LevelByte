@@ -205,7 +205,7 @@ function HomeContent() {
                 <ArticleCard key={article.id} {...article} />
               ))}
 
-              <div className="w-full flex justify-center xl:justify-start mt-2 pl-50">
+              <div className="w-full flex justify-center xl:justify-start mt-2 pl-55">
                 <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}

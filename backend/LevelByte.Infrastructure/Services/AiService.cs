@@ -97,28 +97,28 @@ namespace LevelByte.Application.Services
         {
             return level switch
             {
-                1 => @"You are an AI specialized in simplifying technology articles for English learners.
-                    You create educational content at an easy–intermediate English level (A2–B1).
-                    If the user provides a full article, summarize and simplify it.
-                    If the user provides only a topic, create an article from scratch.
-                    Guidelines for BASIC level:
-                    - Length: between 600 and 800 characters
-                    - Use simple vocabulary and short sentences
-                    - Avoid jargon or complex words
-                    - Explain the topic clearly, with simple examples
-                    - Keep tone friendly and educational.",
+                1 => @"You are an AI specialized in simplifying technology articles and news for English learners.
+                     Your writing level must match A2–B1 English.
+                     If the user provides an article or news text, summarize and simplify it.
+                     If the user provides only a topic or headline, create an article from scratch.
+                     BASIC LEVEL RULES:
+                    - Length: 600–800 characters
+                    - Use very short and clear sentences
+                    - Avoid technical terms or explain them simply
+                    - Always include one simple example
+                    - Tone must be light, friendly, and educational.",
 
-                2 => @"You are an AI specialized in writing advanced technology articles for English learners and professionals.
-                       You create educational content at an advanced English level (B2–C1).
-                       If the user provides a full article, summarize and adapt it in a technical and fluent style.
-                       If the user provides only a topic, create an article from scratch with depth and precision.
-                       Guidelines for ADVANCED level:
-                       - Length: between 800 and 1200 characters
-                       - Use advanced vocabulary and technical accuracy
-                       - Explain context, importance, and applications
-                       - Keep text cohesive, professional, and detailed.",
+                2 => @"You are an AI specialized in writing advanced technology articles and news summaries for English learners.
+                    Your writing level must match B2–C1 English.
+                    If the user provides an article or news text, summarize and rewrite it in a more technical and fluent style.
+                    If the user provides only a topic or headline, create a structured article from scratch.
+                    ADVANCED LEVEL RULES:
+                    - Length: 800–1100 characters
+                    - Use advanced vocabulary with technical precision
+                    - Provide context, relevance, and real-world applications
+                    - Maintain a cohesive, professional tone.",
 
-                _ => "You are an AI assistant that writes educational technology articles."
+                _ => "You are an AI assistant that writes educational technology articles and news summaries."
             };
         }
 
@@ -127,18 +127,17 @@ namespace LevelByte.Application.Services
             return level switch
             {
                 1 => $@"Input: {input}
-                    If this input is a full article, rewrite and summarize it for English learners at a BASIC level (A2–B1),
-                    keeping 600–800 characters. 
-                    If it’s only a topic (like 'Data Structures' or 'APIs'), create a simple educational text about it from scratch.
-                    Focus on clarity, simplicity, and comprehension.",
+                    If this input is a full article or news text, rewrite and simplify it for English learners (A2–B1),
+                    keeping 600–800 characters.
+                    If it is only a topic or headline, create a simple educational text about it with one example.",
 
                 2 => $@"Input: {input}
-                    If this input is a full article, summarize and rewrite it for advanced English learners (B2–C1) with technical detail,
-                    keeping 800–1200 characters. 
-                    If it’s only a topic, create a deep, structured article from scratch, exploring the principles, context,
-                    and real-world applications of {input}.",
+                    If this input is a full article or news text, summarize and rewrite it for advanced English learners (B2–C1),
+                    keeping 800–1100 characters.
+                    If it is only a topic or headline, create a deeper article explaining principles, context, relevance,
+                    and applications related to {input}.",
 
-                _ => $"Write an educational article about {input}."
+                _ => $"Write an educational article or news summary about {input}."
             };
         }
 

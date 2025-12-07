@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Level Byte - Aprenda programação lendo notícias reais do mundo tech",
+    default: "Level Byte - Easy articles for technology students",
     template: "%s | Level Byte",
   },
   description:
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
   "levelbyte programação",
   ],
   openGraph: { 
-    title: "Level Byte - Aprenda programação lendo notícias reais do mundo tech!",
+    title: "Level Byte - Easy articles for technology students",
     images: [`${process.env.NEXT_PUBLIC_URL}/logo.jpg`]
   },
   robots:{
