@@ -54,8 +54,8 @@ export function ArticleDetail({ article, onLevelUpdate}: ArticleDetailProps) {
 
   return (
     <>
-      <main className="bg-gray-900 text-white min-h-screen flex flex-col items-center py-10">
-        <div className="w-full max-w-[700px]">
+      <main className="bg-gray-900 text-white min-h-screen flex flex-col items-center py-10 pt-24 md:pt-28">
+        <div className="w-full max-w-[700px] px-4">
           <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
             <div className="mb-4">
               <h1 className="text-2xl font-bold text-gray-900 mb-2">
