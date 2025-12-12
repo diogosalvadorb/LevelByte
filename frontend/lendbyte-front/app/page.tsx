@@ -5,7 +5,7 @@ import { ArticleCard } from "@/components/ArticleCard";
 import { ArticleCardData } from "@/types/article";
 import { fetchArticles, getArticleImageUrl } from "@/lib/api";
 import Link from "next/link";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaNewspaper, FaGraduationCap } from "react-icons/fa";
 import { Pagination } from "@/components/Pagination";
 
 function HomeContent() {
@@ -24,7 +24,7 @@ function HomeContent() {
   const [hasPreviousPage, setHasPreviousPage] = useState(false);
   const [hasNextPage, setHasNextPage] = useState(false);
 
-  const pageSize = 8;
+  const pageSize = 9;
 
   useEffect(() => {
     async function loadArticles() {
@@ -46,7 +46,11 @@ function HomeContent() {
             return {
               id: article.id,
               title: article.title,
-              date: new Date(article.createdAt).toLocaleDateString("pt-BR"),
+              date: new Date(article.createdAt).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              }),
               content: levelOne.text,
               image: imageUrl,
             };
@@ -91,121 +95,117 @@ function HomeContent() {
   };
 
   return (
-    <main className="bg-gray-900 text-white min-h-screen py-6 md:py-10 px-4">
-      <div className="w-full max-w-6xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4 md:mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-center md:text-left">
-            {termFromUrl ? `Results for "${termFromUrl}"` : "Latest Articles"}
-          </h1>
+    <main className="bg-gray-900 min-h-screen pt-24 pb-16">
+      <div className="container mx-auto px-6">
+        {!termFromUrl && currentPage === 1 && (
+          <div className="mb-12">
+            <div className="bg-linear-to-br from-blue-600 via-purple-600 to-indigo-700 rounded-2xl p-8 md:p-12 text-white shadow-2xl">
+              <div className="max-w-3xl">
+                <h1 className="text-4xl md:text-5xl font-bold mb-4">
+                  Master English Through Technology
+                </h1>
+                <p className="text-xl text-blue-100 mb-6">
+                  Read real tech news adapted to your level. Learn naturally, stay informed, and level up your English.
+                </p>
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg">
+                    <FaNewspaper className="text-blue-200" />
+                    <span className="text-sm font-medium">Daily Tech News</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg">
+                    <FaGraduationCap className="text-blue-200" />
+                    <span className="text-sm font-medium">2 Difficulty Levels</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
-          {totalCount > 0 && (
-            <p className="text-sm text-gray-400">
-              {totalCount} article{totalCount !== 1 ? "s" : ""} found
+        <div className="mb-8">
+          <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search articles..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full bg-gray-800 text-gray-100 placeholder-gray-400 px-5 py-4 pr-24 rounded-xl border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-lg"
+              />
+              <button
+                type="submit"
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg transition-all cursor-pointer shadow-sm hover:shadow-md"
+              >
+                <FaSearch size={18} />
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+          <div>
+            <h2 className="text-2xl font-bold text-white">
+              {termFromUrl ? `Search Results` : "Latest Articles"}
+            </h2>
+            {termFromUrl && (
+              <p className="text-gray-400 mt-1">
+                Found <span className="font-semibold text-blue-400">{totalCount}</span> articles for &quot;{termFromUrl}&quot;
+              </p>
+            )}
+          </div>
+          {totalCount > 0 && !termFromUrl && (
+            <p className="text-sm text-gray-400 bg-gray-800 px-4 py-2 rounded-lg border border-gray-700">
+              {totalCount} articles available
             </p>
           )}
         </div>
 
-        {/* Mobile */}
-        <div className="block md:hidden mb-6">
-          <form
-            onSubmit={handleSearch}
-            className="flex flex-row items-center gap-2 w-full"
-          >
-            <input
-              type="text"
-              placeholder="Search..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-1 bg-gray-800 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              type="submit"
-              className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition cursor-pointer flex items-center justify-center"
-            >
-              <FaSearch size={16} />
-            </button>
-          </form>
-        </div>
-
         {loading && (
-          <p className="text-center text-gray-400">Loading articles...</p>
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+          </div>
         )}
-        {error && <p className="text-center text-red-400">{error}</p>}
+
+        {error && (
+          <div className="bg-red-900/30 border border-red-700 text-red-200 px-6 py-4 rounded-xl text-center">
+            {error}
+          </div>
+        )}
 
         {!loading && !error && articles.length === 0 && (
-          <div className="text-center mt-8">
-            <p className="text-gray-400 mb-4">
-              {termFromUrl
-                ? `No articles found matching "${termFromUrl}".`
-                : "No articles found."}
-            </p>
-            {termFromUrl && (
-              <Link
-                href="/"
-                className="text-blue-400 hover:text-blue-300 underline"
-              >
-                Clear search and view all articles
-              </Link>
-            )}
+          <div className="text-center py-20">
+            <div className="bg-gray-800 rounded-xl p-12 border border-gray-700 shadow-xl max-w-md mx-auto">
+              <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                <FaSearch className="text-gray-400 text-2xl" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-2">No articles found</h3>
+              <p className="text-gray-400 mb-6">
+                {termFromUrl
+                  ? `No articles match "${termFromUrl}". Try a different search term.`
+                  : "No articles available at the moment."}
+              </p>
+              {termFromUrl && (
+                <Link
+                  href="/"
+                  className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition font-medium"
+                >
+                  View all articles
+                </Link>
+              )}
+            </div>
           </div>
         )}
 
         {!loading && !error && articles.length > 0 && (
           <>
-            <div className="flex flex-col gap-6 items-center xl:items-start">
-              <form
-                onSubmit={handleSearch}
-                className="hidden md:flex xl:hidden flex-row w-full sm:max-w-[675px] gap-2"
-              >
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="flex-1 bg-gray-800 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <button
-                  type="submit"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition cursor-pointer whitespace-nowrap"
-                >
-                  Search
-                </button>
-              </form>
-
-              <div className="hidden xl:flex flex-row items-start gap-8 w-full">
-                <div className="flex-1 w-full">
-                  <ArticleCard {...articles[0]} />
-                </div>
-
-                <form
-                  onSubmit={handleSearch}
-                  className="flex flex-row w-96 gap-2"
-                >
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="flex-1 bg-gray-800 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <button
-                    type="submit"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition cursor-pointer whitespace-nowrap"
-                  >
-                    Search
-                  </button>
-                </form>
-              </div>
-
-              <div className="block xl:hidden">
-                <ArticleCard {...articles[0]} />
-              </div>
-
-              {articles.slice(1).map((article) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+              {articles.map((article) => (
                 <ArticleCard key={article.id} {...article} />
               ))}
+            </div>
 
-              <div className="w-full flex justify-center xl:justify-start mt-2 pl-55">
+            {totalPages > 1 && (
+              <div className="flex justify-center mt-12">
                 <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
@@ -214,7 +214,7 @@ function HomeContent() {
                   hasNextPage={hasNextPage}
                 />
               </div>
-            </div>
+            )}
           </>
         )}
       </div>
@@ -224,16 +224,13 @@ function HomeContent() {
 
 export default function Home() {
   return (
-    <Suspense fallback={
-        <main className="bg-gray-900 text-white min-h-screen flex flex-col items-center py-10 px-4">
-          <div className="w-full max-w-6xl">
-            <h1 className="text-3xl font-bold mb-8 text-center md:text-left">
-              Latest Articles
-            </h1>
-            <p className="text-center text-gray-400">Loading articles...</p>
-          </div>
+    <Suspense
+      fallback={
+        <main className="bg-gray-900 min-h-screen flex items-center justify-center pt-24">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
         </main>
-      }>
+      }
+    >
       <HomeContent />
     </Suspense>
   );

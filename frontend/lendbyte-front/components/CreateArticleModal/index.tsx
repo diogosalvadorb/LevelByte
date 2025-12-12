@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, ChangeEvent, FormEvent } from "react";
-import { FaTimes, FaUpload } from "react-icons/fa";
+import { FaTimes, FaUpload, FaCheckCircle } from "react-icons/fa";
 import Image from "next/image";
 import { createArticle } from "@/lib/api";
 
@@ -23,6 +23,7 @@ export default function CreateArticleModal({
   const [generateAudio, setGenerateAudio] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -51,6 +52,7 @@ export default function CreateArticleModal({
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccess(false);
 
     if (!title.trim()) {
       setError("Title is required");
@@ -77,13 +79,21 @@ export default function CreateArticleModal({
         image ?? undefined
       );
 
+      setSuccess(true);
+      
+      // Limpar formulário
       setTitle("");
       setTheme("");
       setImage(null);
       setImagePreview("");
       setGenerateAudio(true);
 
-      onSuccess();
+      // Aguardar 1.5s antes de fechar
+      setTimeout(() => {
+        setSuccess(false);
+        onSuccess();
+        onClose();
+      }, 1500);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
@@ -99,6 +109,7 @@ export default function CreateArticleModal({
       setImagePreview("");
       setGenerateAudio(true);
       setError("");
+      setSuccess(false);
       onClose();
     }
   };
@@ -107,7 +118,7 @@ export default function CreateArticleModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 bg-opacity-40 p-4">
-      <div className="bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-700">
         <div className="flex justify-between items-center p-6 border-b border-gray-700">
           <h2 className="text-2xl font-bold text-white">Create New Article</h2>
           <button
@@ -120,8 +131,18 @@ export default function CreateArticleModal({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {error && (
-            <div className="bg-red-900 bg-opacity-50 border border-red-500 text-red-200 px-4 py-3 rounded">
+          {success && (
+            <div className="bg-green-900/50 border border-green-500 text-green-200 px-4 py-3 rounded-lg flex items-center gap-3">
+              <FaCheckCircle size={20} className="text-green-400" />
+              <div>
+                <p className="font-semibold">Article created successfully!</p>
+                <p className="text-sm text-green-300">Redirecting...</p>
+              </div>
+            </div>
+          )}
+
+          {error && !success && (
+            <div className="bg-red-900/50 border border-red-500 text-red-200 px-4 py-3 rounded-lg">
               {error}
             </div>
           )}
@@ -140,7 +161,7 @@ export default function CreateArticleModal({
               onChange={(e) => setTitle(e.target.value)}
               className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter article title"
-              disabled={isSubmitting}
+              disabled={isSubmitting || success}
               maxLength={200}
             />
           </div>
@@ -164,7 +185,7 @@ export default function CreateArticleModal({
                   accept="image/*"
                   onChange={handleImageChange}
                   className="hidden"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || success}
                 />
               </label>
 
@@ -185,7 +206,7 @@ export default function CreateArticleModal({
                       setImagePreview("");
                     }}
                     className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-2 transition-colors"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || success}
                   >
                     <FaTimes size={16} />
                   </button>
@@ -210,7 +231,7 @@ export default function CreateArticleModal({
               onChange={(e) => setTheme(e.target.value)}
               className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[150px] resize-y"
               placeholder="Enter a phrase or text (max 5000 characters)"
-              disabled={isSubmitting}
+              disabled={isSubmitting || success}
               maxLength={5000}
             />
             <p className="text-sm text-gray-400 mt-2">
@@ -225,7 +246,7 @@ export default function CreateArticleModal({
                 id="generateAudio"
                 checked={generateAudio}
                 onChange={(e) => setGenerateAudio(e.target.checked)}
-                disabled={isSubmitting}
+                disabled={isSubmitting || success}
                 className="w-5 h-5 text-blue-600 bg-gray-600 border-gray-500 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
               />
               <label
@@ -246,17 +267,21 @@ export default function CreateArticleModal({
             <button
               type="button"
               onClick={handleClose}
-              disabled={isSubmitting}
+              disabled={isSubmitting || success}
               className="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              disabled={isSubmitting || success}
+              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
             >
-              {isSubmitting ? "Creating..." : "Create Article"}
+              {isSubmitting && (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              )}
+              {success && <FaCheckCircle />}
+              {success ? "Created!" : isSubmitting ? "Creating..." : "Create Article"}
             </button>
           </div>
         </form>
