@@ -38,12 +38,28 @@ namespace LevelByte.Application.Commands.ArticleCommands.CreateArticle
 
             var article = new Article(request.Title, imageUrl);
 
-            //var basicText = await _aiService.GenerateAiArticleTextAsync(request.Theme, 1);
-            var basicText = GenerateOpenAIBasicText(request.Theme);
-            //var basicAudio = request.GenerateAudio ? await _aiService.GenerateAudioAsync(basicText, request.Title, 1) : string.Empty;
-            var basicAudio = string.Empty;
+            var basicTextTask = _aiService.GenerateAiArticleTextAsync(request.Theme, 1);
+            var advancedTextTask = _aiService.GenerateAiArticleTextAsync(request.Theme, 2);
+
+            var texts = await Task.WhenAll(basicTextTask, advancedTextTask);
+            var basicText = texts[0];
+            var advancedText = texts[1];
 
             var basicWordCount = CountWords(basicText);
+            var advancedWordCount = CountWords(advancedText);
+
+            string basicAudio = string.Empty;
+            string advancedAudio = string.Empty;
+
+            if (request.GenerateAudio)
+            {
+                var basicAudioTask = _aiService.GenerateAudioAsync(basicText, request.Title, 1);
+                var advancedAudioTask = _aiService.GenerateAudioAsync(advancedText, request.Title, 2);
+
+                var audios = await Task.WhenAll(basicAudioTask, advancedAudioTask);
+                basicAudio = audios[0];
+                advancedAudio = audios[1];
+            }
 
             var basicLevel = new ArticleLevel(
                 article.Id,
@@ -52,13 +68,6 @@ namespace LevelByte.Application.Commands.ArticleCommands.CreateArticle
                 basicAudio,
                 basicWordCount
             );
-
-            //var advancedText = await _aiService.GenerateAiArticleTextAsync(request.Theme, 2);
-            var advancedText = GenerateOpenAIBasicText(request.Theme);
-            //var advancedAudio = request.GenerateAudio ? await _aiService.GenerateAudioAsync(advancedText, article.Title, 2) : string.Empty;
-            var advancedAudio = string.Empty;
-
-            var advancedWordCount = CountWords(advancedText);
 
             var advancedLevel = new ArticleLevel(
                 article.Id,
@@ -71,7 +80,7 @@ namespace LevelByte.Application.Commands.ArticleCommands.CreateArticle
             article.AddLevel(basicLevel);
             article.AddLevel(advancedLevel);
 
-            var created = await _repository.CreateArticleAsync(article);
+            await _repository.CreateArticleAsync(article);
 
             return new ArticleViewModel
             {
