@@ -35,7 +35,7 @@ Ideal para quem quer aprender inglês técnico de forma prática. Aprenda tecnol
 
 Antes de executar o projeto, você precisará ter instalado em seu ambiente:
 
-- **.NET 9.0 SDK**
+- **.NET 8.0 SDK**
 - **SQL PostGres**
 - **Git** (para clonar o repositório)
 - **Node.js 22.18**
