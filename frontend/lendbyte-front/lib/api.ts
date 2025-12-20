@@ -90,13 +90,17 @@ export const fetchArticleById = async (id: string): Promise<Article | null> => {
     const article = response.data;
 
     if (!article || !article.levels || !Array.isArray(article.levels)) {
-      console.error("Invalid article structure:", article);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Invalid article structure");
+      }
       return null;
     }
 
     return article;
   } catch (error) {
-    console.error("Error fetching article by ID:", error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error("Error fetching article by ID");
+    }
     return null;
   }
 };

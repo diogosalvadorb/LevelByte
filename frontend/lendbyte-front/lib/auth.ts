@@ -1,6 +1,12 @@
-import { NextAuthOptions } from 'next-auth'
-import CredentialsProvider from 'next-auth/providers/credentials'
-import { login } from './api'
+import { NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { login } from "./api";
+
+if (!process.env.NEXTAUTH_SECRET) {
+  throw new Error(
+    "NEXTAUTH_SECRET não está definido nas variáveis de ambiente"
+  );
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -12,12 +18,12 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          return null
+          return null;
         }
 
         try {
-          const response = await login(credentials.email, credentials.password)
-          
+          const response = await login(credentials.email, credentials.password);
+
           if (response.token && response.email && response?.name && response?.role) {
             return {
               id: response.email,
@@ -25,13 +31,16 @@ export const authOptions: NextAuthOptions = {
               role: response.role,
               email: response.email,
               accessToken: response.token,
-            }
+            };
           }
-          
-          return null
+
+          return null;
         } catch (error) {
-          console.error('Erro na autenticação:', error)
-          return null
+          // Não logar informações sensíveis - apenas logar que houve erro sem detalhes
+          if (process.env.NODE_ENV === "development") {
+            console.error("Erro na autenticação: Falha ao autenticar usuário");
+          }
+          return null;
         }
       },
     }),
@@ -39,25 +48,25 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.accessToken = user.accessToken
-        token.email = user.email
-        token.name = user.name
-        token.role = user.role
+        token.accessToken = user.accessToken;
+        token.email = user.email;
+        token.name = user.name;
+        token.role = user.role;
       }
-      return token
+      return token;
     },
     async session({ session, token }) {
       if (token) {
-        session.user = { 
-          ...session.user, 
+        session.user = {
+          ...session.user,
           id: token.email as string,
           name: token.name as string,
           role: token.role as string,
           email: token.email as string,
-          accessToken: token.accessToken as string
-        }
+          accessToken: token.accessToken as string,
+        };
       }
-      return session
+      return session;
     },
   },
   pages: {
@@ -68,9 +77,8 @@ export const authOptions: NextAuthOptions = {
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60,
   },
-
   secret: process.env.NEXTAUTH_SECRET,
-  debug: false,
+  debug: false, // Sempre false para não expor informações sensíveis
   useSecureCookies: process.env.NODE_ENV === 'production',
   cookies: {
     sessionToken: {
@@ -83,4 +91,4 @@ export const authOptions: NextAuthOptions = {
       },
     },
   },
-}
+};
