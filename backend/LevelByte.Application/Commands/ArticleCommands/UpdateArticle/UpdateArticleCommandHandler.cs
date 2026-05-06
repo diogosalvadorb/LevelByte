@@ -1,4 +1,5 @@
-﻿using LevelByte.Application.Validators;
+using LevelByte.Application.Mappings;
+using LevelByte.Application.Validators;
 using LevelByte.Application.ViewModels;
 using LevelByte.Core.Repository;
 using LevelByte.Core.Services;
@@ -46,21 +47,7 @@ namespace LevelByte.Application.Commands.ArticleCommands.UpdateArticle
 
             await _repository.UpdateArticleAsync(article);
 
-            return new ArticleViewModel
-            {
-                Id = article.Id,
-                Title = article.Title,
-                ImageUrl = article.ImageUrl,
-                CreatedAt = article.CreatedAt,
-                Levels = article.Levels.Select(l => new ArticleLevelViewModel
-                {
-                    Id = l.Id,
-                    Level = l.Level,
-                    Text = l.Text,
-                    AudioUrl = l.AudioUrl,
-                    WordCount = l.WordCount
-                }).ToList()
-            };
+            return article.ToViewModel();
         }
     }
 }

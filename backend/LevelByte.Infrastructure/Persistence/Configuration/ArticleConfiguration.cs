@@ -1,4 +1,4 @@
-﻿using LevelByte.Core.Entities;
+using LevelByte.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -19,6 +19,9 @@ namespace LevelByte.Infrastructure.Persistence.Configuration
                 .WithOne(l => l.Article!)
                 .HasForeignKey(l => l.ArticleId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Navigation(a => a.Levels)
+                .UsePropertyAccessMode(PropertyAccessMode.Field);
         }
     }
 }

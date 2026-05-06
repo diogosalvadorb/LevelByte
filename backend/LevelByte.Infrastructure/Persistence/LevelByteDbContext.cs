@@ -22,11 +22,9 @@ namespace LevelByte.Infrastructure.Persistence
                 fullName: "Administrador",
                 email: "admin@levelsbyte.com",
                 passwordHash: "e86f78a8a3caf0b60d8e74e5942aa6d86dc150cd3c03338aef25b7d2d7e3acc7",
-                role: "Admin"
-            )
-            {
-                Id = Guid.NewGuid()
-            };
+                role: "Admin",
+                id: new Guid("b77d51d8-ab9f-49af-9a48-57f710077696")
+            );
 
             modelBuilder.Entity<User>().HasData(adminUser);
         }

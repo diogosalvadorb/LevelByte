@@ -1,6 +1,6 @@
-﻿using Amazon;
 using Amazon.S3;
 using Amazon.S3.Model;
+using LevelByte.Core.Entities;
 using LevelByte.Core.Services;
 using LevelByte.Infrastructure.Services.Models;
 using Microsoft.Extensions.Configuration;
@@ -19,6 +19,7 @@ namespace LevelByte.Application.Services
         private readonly string _secretKey;
         private readonly string _bucket;
         private readonly string _publicBaseUrl;
+
         public AiService(HttpClient httpClient, IConfiguration configuration)
         {
             _httpClient = httpClient;
@@ -40,19 +41,16 @@ namespace LevelByte.Application.Services
         {
             try
             {
-                var systemPrompt = GetSystemPromptByLevel(level);
-                var userPrompt = GetUserPromptByLevel(theme, level);
-
                 var request = new
                 {
                     model = "gpt-4o-mini",
                     messages = new[]
                     {
-                        new { role = "system", content = systemPrompt },
-                        new { role = "user", content = userPrompt }
+                        new { role = "system", content = ArticleGenerationRules.GetSystemPrompt(level) },
+                        new { role = "user", content = ArticleGenerationRules.GetUserPrompt(theme, level) }
                     },
                     temperature = 0.7,
-                    max_tokens = level == 1 ? 350 : 500
+                    max_tokens = ArticleGenerationRules.GetMaxTokens(level)
                 };
 
                 var json = JsonSerializer.Serialize(request, _jsonOptions);
@@ -82,82 +80,13 @@ namespace LevelByte.Application.Services
                     throw new Exception("No article text generated from OpenAI response");
                 }
 
-                articleText = CleanMarkdown(articleText);
-
-                return articleText;
+                return CleanMarkdown(articleText);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error generating article text: {ex.Message}");
                 throw;
             }
-        }
-
-        private string GetSystemPromptByLevel(int level)
-        {
-            return level switch
-            {
-                1 => @"You are an AI specialized in simplifying technology articles and news for English learners.
-                     Your writing level must match A2–B1 English.
-                     If the user provides an article or news text, summarize and simplify it.
-                     If the user provides only a topic or headline, create an article from scratch.
-                     BASIC LEVEL RULES:
-                    - Length: 600–800 characters
-                    - Use very short and clear sentences
-                    - Avoid technical terms or explain them simply
-                    - Always include one simple example
-                    - Tone must be light, friendly, and educational.",
-
-                2 => @"You are an AI specialized in writing advanced technology articles and news summaries for English learners.
-                    Your writing level must match B2–C1 English.
-                    If the user provides an article or news text, summarize and rewrite it in a more technical and fluent style.
-                    If the user provides only a topic or headline, create a structured article from scratch.
-                    ADVANCED LEVEL RULES:
-                    - Length: 800–1100 characters
-                    - Use advanced vocabulary with technical precision
-                    - Provide context, relevance, and real-world applications
-                    - Maintain a cohesive, professional tone.",
-
-                _ => "You are an AI assistant that writes educational technology articles and news summaries."
-            };
-        }
-
-        private string GetUserPromptByLevel(string input, int level)
-        {
-            return level switch
-            {
-                1 => $@"Input: {input}
-                    If this input is a full article or news text, rewrite and simplify it for English learners (A2–B1),
-                    keeping 600–800 characters.
-                    If it is only a topic or headline, create a simple educational text about it with one example.",
-
-                2 => $@"Input: {input}
-                    If this input is a full article or news text, summarize and rewrite it for advanced English learners (B2–C1),
-                    keeping 800–1100 characters.
-                    If it is only a topic or headline, create a deeper article explaining principles, context, relevance,
-                    and applications related to {input}.",
-
-                _ => $"Write an educational article or news summary about {input}."
-            };
-        }
-
-        private static string CleanMarkdown(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text))
-                return text;
-
-            text = System.Text.RegularExpressions.Regex.Replace(text, @"(\*\*|__)(.*?)\1", "$2");
-            text = System.Text.RegularExpressions.Regex.Replace(text, @"(\*|_)(.*?)\1", "$2");
-
-            text = System.Text.RegularExpressions.Regex.Replace(text, @"```[\s\S]*?```", string.Empty);
-
-            text = System.Text.RegularExpressions.Regex.Replace(text, @"^#{1,6}\s*", string.Empty, System.Text.RegularExpressions.RegexOptions.Multiline);
-
-            text = System.Text.RegularExpressions.Regex.Replace(text, @"^\s*>\s*", string.Empty, System.Text.RegularExpressions.RegexOptions.Multiline);
-
-            text = System.Text.RegularExpressions.Regex.Replace(text, @"\n{2,}", "\n\n").Trim();
-
-            return text;
         }
 
         public async Task<string> GenerateAudioAsync(string text, string articleTitle, int level, string voice = "onyx")
@@ -168,7 +97,7 @@ namespace LevelByte.Application.Services
                 {
                     model = "gpt-4o-mini-tts",
                     input = text,
-                    voice = voice,
+                    voice,
                     format = "mp3"
                 };
 
@@ -190,8 +119,7 @@ namespace LevelByte.Application.Services
 
                 await using var audioStream = await response.Content.ReadAsStreamAsync();
 
-                var fileReplaceName = $"{ReplaceFileName(articleTitle)}_{(level == 1 ? "basic" : "advanced")}_{DateTime.UtcNow:yyyyMMdd_HHmmss}.mp3";
-
+                var fileReplaceName = $"{ReplaceFileName(articleTitle)}_{ArticleGenerationRules.GetAudioLevelName(level)}_{DateTime.UtcNow:yyyyMMdd_HHmmss}.mp3";
                 var publicUrl = await UploadToCloudflareR2Async(audioStream, fileReplaceName, "audio/mpeg", "levelbyte");
 
                 Console.WriteLine($"Audio uploaded to R2: {publicUrl}");
@@ -225,10 +153,26 @@ namespace LevelByte.Application.Services
             }
         }
 
+        private static string CleanMarkdown(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return text;
+
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"(\*\*|__)(.*?)\1", "$2");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"(\*|_)(.*?)\1", "$2");
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"```[\s\S]*?```", string.Empty);
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"^#{1,6}\s*", string.Empty, System.Text.RegularExpressions.RegexOptions.Multiline);
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"^\s*>\s*", string.Empty, System.Text.RegularExpressions.RegexOptions.Multiline);
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"\n{2,}", "\n\n").Trim();
+
+            return text;
+        }
+
         private static string ReplaceFileName(string name)
         {
             foreach (var c in Path.GetInvalidFileNameChars())
                 name = name.Replace(c, '_');
+
             return name.Replace(" ", "_").ToLowerInvariant();
         }
 

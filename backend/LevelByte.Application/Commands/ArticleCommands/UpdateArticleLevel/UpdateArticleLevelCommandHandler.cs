@@ -1,4 +1,5 @@
-﻿using LevelByte.Application.ViewModels;
+using LevelByte.Application.Mappings;
+using LevelByte.Application.ViewModels;
 using LevelByte.Core.Repository;
 using MediatR;
 
@@ -20,33 +21,14 @@ namespace LevelByte.Application.Commands.ArticleCommands.UpdateArticleLevel
             if (article == null)
                 return null;
 
-            var level = article.Levels.FirstOrDefault(l => l.Id == request.LevelId);
-
-            if (level == null)
+            if (article.GetLevel(request.LevelId) == null)
                 return null;
 
-            var wordCount = CountWords(request.Text);
-
-            level.UpdateContent(request.Text, request.AudioUrl, wordCount);
+            article.UpdateLevel(request.LevelId, request.Text, request.AudioUrl);
 
             await _repository.UpdateArticleAsync(article);
 
-            return new ArticleLevelViewModel
-            {
-                Id = level.Id,
-                Level = level.Level,
-                Text = level.Text,
-                AudioUrl = level.AudioUrl,
-                WordCount = level.WordCount
-            };
-        }
-
-        private int CountWords(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text))
-                return 0;
-
-            return text.Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Length;
+            return article.GetLevel(request.LevelId)!.ToViewModel();
         }
     }
 }

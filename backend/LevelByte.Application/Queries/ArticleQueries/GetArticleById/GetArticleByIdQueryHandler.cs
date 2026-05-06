@@ -1,4 +1,5 @@
-﻿using LevelByte.Application.ViewModels;
+using LevelByte.Application.Mappings;
+using LevelByte.Application.ViewModels;
 using LevelByte.Core.Repository;
 using MediatR;
 
@@ -19,21 +20,7 @@ namespace LevelByte.Application.Queries.ArticleQueries.GetArticleById
             if (article == null)
                 return null;
 
-            return new ArticleViewModel
-            {
-                Id = article.Id,
-                Title = article.Title,
-                ImageUrl = article.ImageUrl,
-                CreatedAt = article.CreatedAt,
-                Levels = article.Levels.Select(l => new ArticleLevelViewModel
-                {
-                    Id = l.Id,
-                    Level = l.Level,
-                    Text = l.Text,
-                    AudioUrl = l.AudioUrl,
-                    WordCount = l.WordCount
-                }).ToList()
-            };
+            return article.ToViewModel();
         }
     }
 }

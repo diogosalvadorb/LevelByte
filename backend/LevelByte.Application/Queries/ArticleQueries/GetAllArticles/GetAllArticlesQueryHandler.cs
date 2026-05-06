@@ -1,4 +1,5 @@
-﻿using LevelByte.Application.ViewModels;
+using LevelByte.Application.Mappings;
+using LevelByte.Application.ViewModels;
 using LevelByte.Core.Repository;
 using MediatR;
 
@@ -44,21 +45,9 @@ namespace LevelByte.Application.Queries.ArticleQueries.GetAllArticles
                 .Take(request.PageSize)
                 .ToList();
 
-            var articleViewModels = paginatedArticles.Select(article => new ArticleViewModel
-            {
-                Id = article.Id,
-                Title = article.Title,
-                ImageUrl = article.ImageUrl,
-                CreatedAt = article.CreatedAt,
-                Levels = article.Levels.Select(level => new ArticleLevelViewModel
-                {
-                    Id = level.Id,
-                    Level = level.Level,
-                    Text = level.Text,
-                    AudioUrl = level.AudioUrl,
-                    WordCount = level.WordCount
-                }).ToList()
-            }).ToList();
+            var articleViewModels = paginatedArticles
+                .Select(article => article.ToViewModel())
+                .ToList();
 
             return new PaginatedResult<ArticleViewModel>
             {
